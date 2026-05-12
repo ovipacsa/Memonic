@@ -1,0 +1,387 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Mnemonic Studio palette — cosmic / VHS / arcade */
+  --midnight: #0D0221;
+  --midnight-deep: #07011A;
+  --midnight-soft: #150539;
+  --magenta: #FF00A0;
+  --cyan: #00F0FF;
+  --yellow: #F9F002;
+  --purple: #9D00FF;
+  --star: #F4F1FF;        /* near-white for body copy */
+  --star-soft: #C9C2E2;   /* secondary text */
+  --mute: #6E6390;        /* tertiary text */
+  --rule: rgba(0, 240, 255, 0.22); /* cyan hairline */
+
+  /* Legacy tokens kept so existing class names still resolve.
+     Each maps to a cosmic token of equivalent role. */
+  --paper: var(--midnight);
+  --paper-deep: var(--midnight-soft);
+  --ink: var(--star);
+  --ink-soft: var(--star-soft);
+  --oxblood: var(--magenta);
+  --oxblood-ink: #C50080;
+  --teal: var(--cyan);
+  --ochre: var(--yellow);
+  --accent-bg: rgba(157, 0, 255, 0.10);
+
+  --max: 1280px;
+  --gutter: clamp(20px, 4vw, 56px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background: var(--midnight);
+  color: var(--star);
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+}
+
+body {
+  font-family: var(--font-vt323), var(--font-space-mono), ui-monospace, monospace;
+  font-size: 18px;
+  line-height: 1.5;
+  letter-spacing: 0.005em;
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+
+  /* Cosmic backdrop: starfield + sunset-purple nebula */
+  background-color: var(--midnight);
+  background-image:
+    radial-gradient(circle at 18% 20%, rgba(157, 0, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 82% 80%, rgba(255, 0, 160, 0.14), transparent 42%),
+    radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.06), transparent 60%),
+    radial-gradient(1px 1px at 12% 30%, rgba(244, 241, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 70%, rgba(244, 241, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 30% 80%, rgba(244, 241, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 22%, rgba(244, 241, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 12%, rgba(244, 241, 255, 0.4) 50%, transparent 51%);
+  background-attachment: fixed;
+}
+
+/* Scanlines overlay — VHS texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+
+/* Subtle CRT vignette */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+a {
+  color: var(--cyan);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.35);
+  transition: color 120ms ease, text-shadow 120ms ease;
+}
+
+a:hover {
+  color: var(--yellow);
+  border-bottom-color: var(--yellow);
+  text-shadow: 0 0 8px rgba(249, 240, 2, 0.6);
+}
+
+::selection {
+  background: var(--magenta);
+  color: var(--midnight);
+}
+
+/* Type roles */
+.serif {
+  font-family: var(--font-monoton), var(--font-audiowide), "Impact", sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.mono {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  letter-spacing: 0.06em;
+}
+
+.terminal {
+  font-family: var(--font-vt323), ui-monospace, monospace;
+}
+
+.sc {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Wordmark — Monoton chrome-era display.
+   Sized against the auth card's inline-size container so "Memonic" always
+   fits inside the bordered box; the cyan dot is translated past the border. */
+.wordmark {
+  font-family: var(--font-monoton), "Impact", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--magenta);
+  font-size: clamp(36px, 16.6cqw, 138px);
+  text-shadow:
+    0 0 12px rgba(255, 0, 160, 0.55),
+    0 0 28px rgba(255, 0, 160, 0.35),
+    0 0 1px rgba(0, 240, 255, 0.85);
+}
+
+/* Replace Monoton's period (which renders as horizontal stripes) with a styled neon circle. */
+.wordmark .dot {
+  display: inline-block;
+  width: calc(0.4em - 6px);
+  height: calc(0.4em - 6px);
+  margin-left: 20px;
+  border-radius: 50%;
+  background: var(--cyan);
+  vertical-align: middle;
+  transform: translateY(-0.03em);
+  box-shadow:
+    0 0 12px rgba(0, 240, 255, 0.85),
+    0 0 28px rgba(0, 240, 255, 0.55),
+    inset 0 0 6px rgba(255, 255, 255, 0.4);
+  text-indent: -9999px;
+  overflow: hidden;
+  color: transparent;
+}
+
+/* Headlines glow magenta; section labels glow cyan */
+.glow-magenta { text-shadow: 0 0 8px rgba(255, 0, 160, 0.55), 0 0 18px rgba(255, 0, 160, 0.30); }
+.glow-cyan    { text-shadow: 0 0 8px rgba(0, 240, 255, 0.55), 0 0 18px rgba(0, 240, 255, 0.30); }
+.glow-yellow  { text-shadow: 0 0 8px rgba(249, 240, 2, 0.55), 0 0 18px rgba(249, 240, 2, 0.30); }
+
+/* Drop cap: chrome glyph */
+.dropcap::first-letter {
+  font-family: var(--font-monoton), "Impact", sans-serif;
+  font-weight: 400;
+  font-size: 3em;
+  line-height: 0.85;
+  float: left;
+  padding: 6px 12px 0 0;
+  color: var(--magenta);
+  text-shadow: 0 0 10px rgba(255, 0, 160, 0.5);
+}
+
+@media (min-width: 768px) {
+  .dropcap::first-letter {
+    font-size: 4em;
+    padding: 6px 14px 0 0;
+  }
+}
+
+/* Hairline rule */
+.rule { border-color: var(--rule); }
+.rule-double { border-top: 2px double var(--cyan); box-shadow: 0 1px 0 rgba(0, 240, 255, 0.25); }
+
+/* Form controls — terminal feel */
+label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+input:not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+textarea,
+select {
+  background: rgba(13, 2, 33, 0.85);
+  border: none;
+  border-bottom: 1px solid var(--cyan);
+  color: var(--star);
+  font: inherit;
+  font-family: var(--font-vt323), ui-monospace, monospace;
+  font-size: 20px;
+  padding: 10px 8px;
+  width: 100%;
+  outline: none;
+  border-radius: 0;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  color-scheme: dark;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300F0FF' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+select option {
+  background: #150539;
+  color: var(--star);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--mute);
+}
+
+input:not([type="file"]):not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+select:focus {
+  border-bottom-color: var(--magenta);
+  box-shadow: 0 1px 0 0 var(--magenta), 0 0 14px rgba(255, 0, 160, 0.35);
+  background: rgba(157, 0, 255, 0.06);
+}
+
+input[type="date"] {
+  color-scheme: dark;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.55;
+  font-family: var(--font-vt323), ui-monospace, monospace;
+  font-size: 22px;
+}
+
+/* Buttons — arcade chrome */
+button {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--cyan);
+  background: transparent;
+  color: var(--cyan);
+  padding: 12px 22px;
+  position: relative;
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    box-shadow 160ms ease,
+    transform 60ms ease;
+}
+
+button:hover:not(:disabled) {
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--yellow);
+  border-color: var(--yellow);
+  box-shadow: 0 0 14px rgba(249, 240, 2, 0.55), inset 0 0 14px rgba(249, 240, 2, 0.10);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button.primary {
+  background: var(--yellow);
+  color: var(--midnight);
+  border-color: var(--yellow);
+  box-shadow: 0 0 18px rgba(249, 240, 2, 0.45);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--magenta);
+  color: var(--midnight);
+  border-color: var(--magenta);
+  box-shadow: 0 0 22px rgba(255, 0, 160, 0.65);
+}
+
+button.ghost {
+  border: none;
+  padding: 4px 0;
+  background: transparent;
+  color: var(--star-soft);
+  letter-spacing: 0.18em;
+}
+
+button.ghost:hover:not(:disabled) {
+  background: transparent;
+  color: var(--cyan);
+  box-shadow: none;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Keyboard focus — visible ring for all interactive elements */
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 3px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+  border-bottom-color: transparent;
+}
+
+/* Animations */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.85; }
+}
+
+.rise   { animation: rise .7s cubic-bezier(.2, .7, .2, 1) both; container-type: inline-size; }
+.flicker { animation: flicker 4s infinite; }
+
+@keyframes pulse-ring {
+  0%, 100% {
+    box-shadow:
+      0 0 0 4px var(--magenta),
+      0 0 8px rgba(255,0,160,0.4),
+      0 0 12px rgba(0,240,255,0.85),
+      0 0 28px rgba(0,240,255,0.55),
+      inset 0 0 6px rgba(255,255,255,0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px var(--magenta),
+      0 0 22px rgba(255,0,160,0.95),
+      0 0 12px rgba(0,240,255,0.85),
+      0 0 28px rgba(0,240,255,0.55),
+      inset 0 0 6px rgba(255,255,255,0.4);
+  }
+}
+
+.dot-return {
+  animation: pulse-ring 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

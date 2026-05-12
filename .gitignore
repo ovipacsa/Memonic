@@ -1,0 +1,92 @@
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# Dependencies
+node_modules/
+bower_components/
+jspm_packages/
+.pnp
+.pnp.js
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+.next/
+.nuxt/
+out/
+.cache/
+.parcel-cache/
+.turbo/
+.svelte-kit/
+
+# Memonic local DB
+data/
+
+# Testing
+coverage/
+.nyc_output/
+
+# IDE / Editor
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Secrets / Credentials
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Misc
+.tmp/
+tmp/
+temp/
+
+# Claude / AI tooling
+.claude/settings.local.json
+.claude/ralph-loop.local.md
+.playwright-mcp/
+.agents/
+memory/
+skills-lock.json
+
+# Audit / scratch images
+audit-*.png
+wordmark-*.png
+wordmark-*.jpg
+
+# Planning docs (not part of the app)
+PLAN.md
+prompt_2_create_brand_command.md
+TestUsers.txt

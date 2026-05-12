@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Auto: Start Dev Server & Open App",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/.vscode/start-dev.ps1"
+      ],
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "never",
+        "panel": "dedicated",
+        "close": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

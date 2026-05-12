@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Memonic — Marketing Plan · Edition I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F3EBDA;
+    --paper-deep: #EBE1CC;
+    --ink: #1A1612;
+    --ink-soft: #3E342A;
+    --mute: #857664;
+    --rule: #BEA889;
+    --oxblood: #7B1E2F;
+    --oxblood-ink: #4F1220;
+    --teal: #2E4A47;
+    --ochre: #B8925A;
+    --accent-bg: #ECE0C8;
+    --max: 1200px;
+    --gutter: clamp(24px, 4vw, 64px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;font-synthesis:none}
+  body{
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    letter-spacing: 0.005em;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* grain / newsprint overlay */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;
+    background-image:
+      radial-gradient(rgba(26,22,18,0.06) 1px, transparent 1px),
+      radial-gradient(rgba(26,22,18,0.04) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 1px;
+    mix-blend-mode: multiply;
+    opacity: .55;
+    z-index: 1000;
+  }
+  a{color:var(--oxblood);text-decoration:none;border-bottom:1px solid rgba(123,30,47,.25)}
+  a:hover{background:rgba(123,30,47,.08)}
+  ::selection{background:var(--oxblood);color:var(--paper)}
+
+  /* type */
+  .serif{font-family: "Fraunces", "Times New Roman", serif; font-optical-sizing: auto;}
+  .mono{font-family: "IBM Plex Mono", ui-monospace, monospace;}
+  .sc{font-variant-caps: all-small-caps; letter-spacing:.14em;}
+  .italic{font-style:italic}
+
+  /* layout container */
+  .wrap{max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter)}
+
+  /* masthead */
+  header.masthead{
+    padding: clamp(32px, 5vw, 64px) 0 clamp(24px,3vw,40px);
+    border-bottom: 1.5px solid var(--ink);
+    margin-bottom: 0;
+  }
+  .masthead-top{
+    display:flex;justify-content:space-between;align-items:center;
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 0.5px solid var(--rule);
+    padding-bottom: 12px;
+    margin-bottom: clamp(28px, 4vw, 48px);
+  }
+  .masthead-top span{display:inline-block}
+  .wordmark{
+    font-family:"Fraunces", serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(72px, 14vw, 200px);
+    line-height: .85;
+    letter-spacing: -0.045em;
+    color: var(--ink);
+    font-variation-settings: "SOFT" 80, "opsz" 144;
+    text-align:center;
+    display:block;
+  }
+  .wordmark .dot{color:var(--oxblood)}
+  .sub{
+    text-align:center;
+    margin-top: 20px;
+    font-family:"Fraunces", serif;
+    font-size: clamp(16px, 1.4vw, 20px);
+    font-style:italic;
+    color: var(--ink-soft);
+    letter-spacing: .02em;
+  }
+  .edition-line{
+    display:flex;justify-content:space-between;align-items:baseline;
+    margin-top: clamp(32px, 4vw, 56px);
+    padding-top: 14px;
+    border-top: 3px double var(--ink);
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* hero headline */
+  section.hero{
+    padding: clamp(56px, 8vw, 120px) 0 clamp(40px, 6vw, 80px);
+    border-bottom: 0.5px solid var(--rule);
+  }
+  h1.kicker{
+    font-family:"Fraunces", serif;
+    font-size: clamp(44px, 6.4vw, 96px);
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    font-weight: 400;
+    color: var(--ink);
+    max-width: 18ch;
+    font-variation-settings: "SOFT" 50, "opsz" 144;
+  }
+  h1.kicker em{
+    font-style: italic;
+    color: var(--oxblood);
+    font-weight: 300;
+  }
+  .lede-cols{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: clamp(24px, 3vw, 48px);
+    margin-top: clamp(40px, 5vw, 72px);
+    padding-top: clamp(32px, 4vw, 48px);
+    border-top: 0.5px solid var(--rule);
+  }
+  .lede-cols p{
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    column-fill:balance;
+    hanging-punctuation: first;
+  }
+  .lede-cols p:first-child::first-letter{
+    font-family:"Fraunces", serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 4.4em;
+    line-height: .84;
+    float: left;
+    padding: 6px 10px 0 0;
+    color: var(--oxblood);
+  }
+  @media (max-width: 780px){
+    .lede-cols{grid-template-columns: 1fr}
+  }
+
+  /* TOC */
+  .toc{
+    padding: clamp(28px, 4vw, 48px) 0;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .toc h2{
+    font-family:"Fraunces", serif;
+    font-weight: 400;
+    font-size: 18px;
+    font-variant-caps: all-small-caps;
+    letter-spacing: .22em;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+  .toc ol{
+    list-style: none;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px 28px;
+  }
+  .toc ol li{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-top: 0.5px solid var(--rule);
+    padding-top: 10px;
+    line-height: 1.45;
+  }
+  .toc ol li a{color:var(--ink);border-bottom:0}
+  .toc ol li a:hover{color:var(--oxblood);background:transparent}
+  .toc ol li .n{color:var(--oxblood);margin-right:8px}
+  @media (max-width:900px){.toc ol{grid-template-columns: repeat(2,1fr)}}
+
+  /* sections */
+  section.part{
+    padding: clamp(64px, 8vw, 120px) 0;
+    border-bottom: 0.5px solid var(--rule);
+    scroll-margin-top: 24px;
+  }
+  .part-head{
+    display:grid;
+    grid-template-columns: 80px 1fr;
+    gap: 28px;
+    align-items: baseline;
+    margin-bottom: clamp(32px, 4vw, 56px);
+    padding-bottom: 24px;
+    border-bottom: 0.5px solid var(--rule);
+  }
+  .part-num{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: .18em;
+    color: var(--oxblood);
+    text-transform: uppercase;
+    align-self: start;
+    padding-top: 14px;
+    border-top: 2px solid var(--oxblood);
+    display:inline-block;
+    width: 56px;
+  }
+  .part-title{
+    font-family:"Fraunces", serif;
+    font-weight: 350;
+    font-size: clamp(30px, 4.2vw, 56px);
+    line-height: 1.02;
+    letter-spacing: -0.022em;
+    color: var(--ink);
+    font-variation-settings: "SOFT" 40;
+  }
+  .part-title em{font-style:italic;color:var(--oxblood)}
+  .part-dek{
+    font-family:"Fraunces", serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    font-size: clamp(16px, 1.6vw, 20px);
+    max-width: 56ch;
+  }
+
+  /* § positioning */
+  .position-grid{
+    display:grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: clamp(32px, 4vw, 64px);
+  }
+  .position-grid h3{
+    font-family:"Fraunces", serif;
+    font-weight: 400;
+    font-size: 24px;
+    margin-bottom: 12px;
+    letter-spacing: -.012em;
+  }
+  .position-grid p{
+    font-size: 15.5px;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    margin-bottom: 14px;
+  }
+  .stat-rail{
+    background: var(--accent-bg);
+    padding: 32px;
+    border: 0.5px solid var(--rule);
+    position:relative;
+  }
+  .stat-rail::before{
+    content:"❊";
+    position:absolute;top:12px;right:14px;
+    color:var(--ochre);font-size:20px;
+  }
+  .stat-rail dt{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-top: 18px;
+  }
+  .stat-rail dt:first-child{margin-top:0}
+  .stat-rail dd{
+    font-family:"Fraunces", serif;
+    font-size: 22px;
+    line-height: 1.24;
+    color: var(--ink);
+    margin-top: 4px;
+    font-weight: 350;
+  }
+  .stat-rail dd em{color:var(--oxblood);font-style:italic}
+  @media (max-width:900px){.position-grid{grid-template-columns:1fr}}
+
+  .pillars{
+    margin-top: 56px;
+    display:grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 0;
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .pillar{
+    padding: 28px 24px;
+    border-right: 0.5px solid var(--rule);
+  }
+  .pillar:last-child{border-right:none}
+  .pillar .n{
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 11px;
+    letter-spacing: .18em;
+    color: var(--oxblood);
+    text-transform: uppercase;
+  }
+  .pillar h4{
+    font-family:"Fraunces",serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 22px;
+    margin: 10px 0 10px;
+    line-height: 1.2;
+  }
+  .pillar p{font-size: 14px; color: var(--ink-soft); line-height: 1.55}
+  @media (max-width:780px){.pillars{grid-template-columns:1fr}.pillar{border-right:none;border-bottom:0.5px solid var(--rule)}.pillar:last-child{border-bottom:none}}
+
+  /* § competitors gallery */
+  .gallery{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .plate{
+    background: var(--paper-deep);
+    border: 0.5px solid var(--rule);
+    padding: 14px;
+    display:flex;flex-direction:column;
+    position:relative;
+  }
+  .plate figure{margin:0;background:#fff;overflow:hidden;aspect-ratio:4/3;border:0.5px solid rgba(0,0,0,.08)}
+  .plate img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;filter:saturate(.95)}
+  .plate .label{
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    margin-top: 14px;
+  }
+  .plate h5{
+    font-family:"Fraunces",serif;
+    font-weight: 400;
+    font-size: 22px;
+    margin: 4px 0 10px;
+    letter-spacing: -.01em;
+  }
+  .plate .note{font-size:13.5px; color: var(--ink-soft); line-height:1.5}
+  .plate .verdict{
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 0.5px dashed var(--rule);
+    font-family:"Fraunces",serif;
+    font-style: italic;
+    color: var(--teal);
+    font-size: 14.5px;
+  }
+  @media (max-width:980px){.gallery{grid-template-columns:1fr 1fr}}
+  @media (max-width:640px){.gallery{grid-template-columns:1fr}}
+
+  .patterns{
+    margin-top: 56px;
+    padding: 28px 32px;
+    background: var(--accent-bg);
+    border: 0.5px solid var(--rule);
+    border-left: 4px solid var(--oxblood);
+  }
+  .patterns h4{
+    font-family:"Fraunces",serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+  .patterns ul{padding-left: 20px;color:var(--ink-soft);font-size:14.5px}
+  .patterns li{margin-bottom:6px}
+
+  /* § calendar */
+  .calendar-meta{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+    margin-bottom: 40px;
+  }
+  .calendar-meta .m{
+    padding: 22px 18px;
+    border-right: 0.5px solid var(--rule);
+  }
+  .calendar-meta .m:last-child{border-right:none}
+  .calendar-meta .n{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--oxblood);text-transform:uppercase}
+  .calendar-meta .t{font-family:"Fraunces",serif;font-weight:400;font-style:italic;font-size:20px;margin-top:6px;line-height:1.2}
+  @media (max-width:780px){.calendar-meta{grid-template-columns:1fr 1fr}.calendar-meta .m:nth-child(2){border-right:none}.calendar-meta .m:nth-child(-n+2){border-bottom:0.5px solid var(--rule)}}
+
+  .week{
+    margin-bottom: 48px;
+    padding-bottom: 8px;
+  }
+  .week-head{
+    display:flex;align-items:baseline;gap: 24px;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    border-bottom: 0.5px solid var(--rule);
+  }
+  .week-head .wn{
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 11px; letter-spacing:.2em; color: var(--oxblood); text-transform: uppercase;
+  }
+  .week-head .wt{
+    font-family:"Fraunces",serif;
+    font-size: clamp(22px, 2.4vw, 28px);
+    font-weight: 400;
+    letter-spacing: -.01em;
+  }
+  .week-head .wt em{font-style:italic;color:var(--teal)}
+
+  .posts{display:grid;grid-template-columns: 1fr; gap: 0; border-top: 0.5px solid var(--rule)}
+  .post{
+    display:grid;
+    grid-template-columns: 64px 120px 1fr 1fr 1fr;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 0.5px solid var(--rule);
+    align-items: baseline;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .post .day{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase;padding-top:2px}
+  .post .topic{font-family:"Fraunces",serif;font-size: 17px;color:var(--ink);line-height:1.25}
+  .post .angle{color: var(--ink-soft)}
+  .post .visual{color: var(--teal); font-style: italic; font-family:"Fraunces",serif; font-size: 14.5px}
+  .post .tag{
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    align-self: start;
+    padding-top: 2px;
+  }
+  @media (max-width:980px){
+    .post{grid-template-columns: 50px 1fr;gap:10px}
+    .post .tag{display:inline-block;margin-right:10px;margin-bottom:4px}
+    .post .topic{grid-column:2}
+    .post .angle,.post .visual{grid-column:2}
+    .post .visual::before{content:"↳ ";color:var(--ochre)}
+  }
+
+  /* § landing page recs */
+  .recs{
+    counter-reset: recs;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .rec{
+    padding: 26px 28px;
+    border-right: 0.5px solid var(--rule);
+    border-bottom: 0.5px solid var(--rule);
+    counter-increment: recs;
+    position:relative;
+  }
+  .rec:nth-child(2n){border-right:none}
+  .rec:nth-last-child(-n+1){border-bottom:none}
+  .rec::before{
+    content: "§ " counter(recs, decimal-leading-zero);
+    position:absolute;
+    top: 18px;right:24px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 10.5px;
+    letter-spacing: .18em;
+    color: var(--ochre);
+  }
+  .rec h4{font-family:"Fraunces",serif;font-weight:400;font-style:italic;font-size: 22px;margin-right: 70px; margin-bottom: 10px; line-height:1.2}
+  .rec p{font-size: 14.5px;color:var(--ink-soft); line-height: 1.55}
+  .rec .src{
+    margin-top: 10px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    color: var(--teal);
+    text-transform: uppercase;
+  }
+  @media (max-width:780px){.recs{grid-template-columns:1fr}.rec{border-right:none}}
+
+  /* § acquisition */
+  .acq{
+    display:grid;
+    grid-template-columns: 1fr;
+    border-top: 1.5px solid var(--ink);
+  }
+  .acq-row{
+    display:grid;
+    grid-template-columns: 120px 1fr 1fr;
+    gap: 32px;
+    padding: 28px 0;
+    border-bottom: 0.5px solid var(--rule);
+    align-items: baseline;
+  }
+  .acq-row .n{
+    font-family:"Fraunces", serif;
+    font-style: italic;
+    font-size: clamp(48px, 5vw, 72px);
+    color: var(--oxblood);
+    line-height: .85;
+    letter-spacing: -.03em;
+    font-weight: 300;
+  }
+  .acq-row h4{font-family:"Fraunces",serif;font-weight: 400;font-size: 22px;line-height:1.2;margin-bottom: 8px;letter-spacing: -.01em}
+  .acq-row .how{font-size:14px;color:var(--ink-soft)}
+  .acq-row .why{
+    font-family:"Fraunces",serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--teal);
+    line-height:1.5;
+  }
+  @media (max-width: 900px){
+    .acq-row{grid-template-columns: 80px 1fr;gap:18px}
+    .acq-row .why{grid-column: 2}
+  }
+
+  /* § quick wins */
+  .wins{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: 12px;
+  }
+  .win{
+    background: var(--ink);
+    color: var(--paper);
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .win:nth-child(2){background: var(--oxblood)}
+  .win:nth-child(3){background: var(--teal)}
+  .win::before{
+    content: "⚡";
+    position:absolute;top:18px;right:22px;
+    font-size:18px;opacity:.4;
+  }
+  .win .when{
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 10.5px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    opacity: .7;
+  }
+  .win h4{
+    font-family:"Fraunces",serif;
+    font-weight: 350;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -.015em;
+    margin: 12px 0 14px;
+  }
+  .win p{font-size: 14px; line-height: 1.55; opacity: .88}
+  .win .eta{
+    margin-top: 18px;
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    border-top: 0.5px solid rgba(255,255,255,.25);
+    padding-top: 12px;
+    opacity: .9;
+  }
+  @media (max-width:900px){.wins{grid-template-columns:1fr}}
+
+  /* colophon */
+  footer.colophon{
+    padding: clamp(56px, 6vw, 96px) 0 clamp(40px, 5vw, 80px);
+    border-top: 3px double var(--ink);
+  }
+  .colo-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    align-items: baseline;
+  }
+  .colo-grid h5{
+    font-family:"IBM Plex Mono",monospace;
+    font-size: 10.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--oxblood);
+    margin-bottom: 10px;
+  }
+  .colo-grid p{font-size: 13.5px;color: var(--ink-soft);line-height: 1.55}
+  .signoff{
+    margin-top: 56px;
+    font-family:"Fraunces",serif;
+    font-style: italic;
+    font-size: clamp(18px, 2vw, 26px);
+    color: var(--ink);
+    text-align: center;
+    letter-spacing: -.005em;
+  }
+  .signoff em{color: var(--oxblood)}
+  @media (max-width: 780px){.colo-grid{grid-template-columns:1fr}}
+
+  /* staggered entry animation */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px) }
+    to   { opacity: 1; transform: translateY(0) }
+  }
+  .masthead-top, .wordmark, .sub, .edition-line, h1.kicker, .lede-cols, .toc, .part-head, .position-grid, .pillars, .gallery, .patterns, .calendar-meta, .week, .recs, .acq, .wins, .colo-grid, .signoff {
+    animation: rise .9s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .wordmark{animation-delay:.05s}
+  .sub{animation-delay:.14s}
+  .edition-line{animation-delay:.22s}
+  h1.kicker{animation-delay:.3s}
+  .lede-cols{animation-delay:.42s}
+  @media (prefers-reduced-motion: reduce){
+    *{animation: none !important; transition: none !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="masthead-top">
+    <span>Vol. I · № 1</span>
+    <span>Marketing Dossier</span>
+    <span>Hosted · Frankfurt · EU</span>
+  </div>
+
+  <h1 class="wordmark" aria-label="Memonic">Memonic<span class="dot">.</span></h1>
+  <p class="sub">Connect Europe — a field guide for the first hundred weeks.</p>
+
+  <div class="edition-line">
+    <span>Edition I · Issue 01</span>
+    <span>Prepared by Mnemonic Studio</span>
+    <span>24 April 2026</span>
+  </div>
+</header>
+
+<section class="hero">
+  <h1 class="kicker">A quieter social network, <em>made on this continent.</em></h1>
+
+  <div class="lede-cols">
+    <p>Europe spent two decades being the user base of platforms designed somewhere else, for someone else, under rules it did not write. The result is predictable: dense feeds, algorithmic broadcast, consent screens thicker than the products they guard. The competitive research that precedes this plan — Instagram, X, and Facebook observed in a logged-in European session — confirms the convergence. Three products, one template.</p>
+    <p>Memonic enters the gap this creates. Not a Twitter clone, not a Mastodon, not a photo grid. A platform that assumes your circle is small, that treats your words and your pictures with equal care, and that keeps your data, your language, and your consent where they should be: at home, visible, and ours.</p>
+    <p>This dossier is a working plan. It contains the positioning we will use, the first four weeks of public conversation on LinkedIn, seven specific corrections to the landing page, five creative ways to win the first ten thousand members, and three things to ship before Friday. The voice throughout is editorial, not adoring. The aim is to be useful by Monday.</p>
+  </div>
+</section>
+
+<nav class="toc" aria-label="Contents">
+  <h2>In this issue</h2>
+  <ol>
+    <li><a href="#s02"><span class="n">§ 02</span>Positioning · the unique angle</a></li>
+    <li><a href="#s03"><span class="n">§ 03</span>Competitors · the evidence</a></li>
+    <li><a href="#s04"><span class="n">§ 04</span>Four-week LinkedIn calendar</a></li>
+    <li><a href="#s05"><span class="n">§ 05</span>Landing page · seven corrections</a></li>
+    <li><a href="#s06"><span class="n">§ 06</span>Acquisition · five European moves</a></li>
+    <li><a href="#s07"><span class="n">§ 07</span>Quick wins · ship this week</a></li>
+    <li><a href="#s08"><span class="n">§ 08</span>Colophon &amp; metrics</a></li>
+  </ol>
+</nav>
+
+<!-- §02 Positioning -->
+<section class="part" id="s02">
+  <div class="part-head">
+    <div class="part-num">§ 02</div>
+    <div>
+      <h2 class="part-title">Brand positioning — <em>the angle we own</em></h2>
+      <p class="part-dek">A single sentence, a three-pillar architecture, and the table that shows where we sit relative to the three incumbents. Copy this into every deck.</p>
+    </div>
+  </div>
+
+  <div class="position-grid">
+    <div>
+      <h3>Positioning statement</h3>
+      <p><em>For Europeans 15 to 70 who feel broadcast-fatigued on Instagram and algorithm-weary on X, Memonic is a social network where your default audience is a small circle, text and image are equal citizens, and your data lives on this continent — so connecting online finally feels like the way people actually connect in Lisbon, Leipzig, or Tallinn.</em></p>
+      <h3 style="margin-top:28px">The unique angle</h3>
+      <p>We are not faster, cheaper, or newer than the incumbents. We are <em>smaller on purpose, text-and-image equal, and European by construction.</em> Each of those three axes is structurally unavailable to Instagram, X, or Facebook without contradicting their ad business model. That is the moat. The tagline — <strong>"Connect Europe"</strong> — is the promise we make the user; the moat is how we keep it.</p>
+    </div>
+
+    <dl class="stat-rail">
+      <dt>Where we sit</dt>
+      <dd>Between Instagram <em>(visual, broadcast)</em> and X <em>(text, public)</em> — with the volume turned down.</dd>
+      <dt>Default audience</dt>
+      <dd>A named circle of <em>12 to 30</em>, not your entire follower count.</dd>
+      <dt>Content parity</dt>
+      <dd>A 300-character thought and a single photograph render as <em>equally beautiful cards.</em></dd>
+      <dt>Data residency</dt>
+      <dd>Hosted in Frankfurt &amp; Amsterdam. <em>Your posts never leave the Union.</em></dd>
+      <dt>Revenue model</dt>
+      <dd>Optional paid tier. <em>No blended ads in the feed.</em></dd>
+    </dl>
+  </div>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="n">Pillar I</div>
+      <h4>Smaller on purpose</h4>
+      <p>We design for the twelve people you actually miss when you don't see them, not the twelve thousand you will never meet. Broadcast is an opt-in; the circle is the default.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">Pillar II</div>
+      <h4>Words and pictures, equal citizens</h4>
+      <p>A thought is not a lesser post. An image is not a bolted-on attachment. The composer accepts both with equal fluency; the feed renders both with equal care.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">Pillar III</div>
+      <h4>European by construction</h4>
+      <p>Data hosted in the Union. Governance under EU law. Twenty-four languages treated as first-class. Privacy stated above the fold, not buried in a banner at the bottom.</p>
+    </div>
+  </div>
+</section>
+
+<!-- §03 Competitors -->
+<section class="part" id="s03">
+  <div class="part-head">
+    <div class="part-num">§ 03</div>
+    <div>
+      <h2 class="part-title">The evidence — <em>three feeds, one template</em></h2>
+      <p class="part-dek">Captured in logged-in sessions from an EU region, 24 April 2026. What these screenshots show, in aggregate, is convergence: three companies with different histories arriving at the same user interface.</p>
+    </div>
+  </div>
+
+  <div class="gallery">
+    <article class="plate">
+      <figure><img src="screenshots/01-facebook-loggedin.png" alt="Facebook logged-in feed, dark mode"></figure>
+      <div class="label">Subject A · Facebook</div>
+      <h5>A dense civic plaza with slot-machine ads in the margins.</h5>
+      <p class="note">Three columns, dark canvas, Timișoara mayoralty post (Romanian, civic, 205 reactions) placed next to a right-rail gambling advertisement and a day-trading course. Presence dots are elegant; the surrounding density is not.</p>
+      <p class="verdict">Strongest at place-based content; weakest at taste.</p>
+    </article>
+
+    <article class="plate">
+      <figure><img src="screenshots/02-x-loggedin-viewport.png" alt="X logged-in timeline"></figure>
+      <div class="label">Subject B · X</div>
+      <h5>A wire service that sells ad-removal as a feature.</h5>
+      <p class="note">Labeled left rail, "For you / Following" tabs, Elon Musk at 43M views on the first card, a Medthority "Ad" underneath. The right rail's first item is a Premium upsell — the product publicly admits the free tier is compromised.</p>
+      <p class="verdict">Most honest ad label; least honest business model.</p>
+    </article>
+
+    <article class="plate">
+      <figure><img src="screenshots/03-instagram.png" alt="Instagram logged-in feed"></figure>
+      <div class="label">Subject C · Instagram</div>
+      <h5>A gallery without a writing desk.</h5>
+      <p class="note">Chrome melts away; full-colour imagery carries the whole visual budget. Prada editorial, a jeans campaign, a concert-venue shot. There is no text composer in the navigation — a thought without a photograph has no card to live in.</p>
+      <p class="verdict">Gold standard for images; actively hostile to words.</p>
+    </article>
+  </div>
+
+  <div class="patterns">
+    <h4>The convergence pattern</h4>
+    <ul>
+      <li>Three-column layout with a labeled left icon rail is now the template all three share. Copying it means starting derivative.</li>
+      <li>Algorithmic feed with a secondary chronological tab — X surfaces the choice, IG buries it, Facebook hides it further.</li>
+      <li>Engagement counts visible on every post, on every card. None of the three have decided to hide them.</li>
+      <li>Ads interleaved with organic content in the feed itself; only X lifts the word "Ad" into the timestamp slot.</li>
+      <li>Cookie and consent banners shipped as legal tax; not one of the three treats privacy as a selling point.</li>
+      <li>Upsell surfaces occupy prime real estate inside the logged-in product (X Premium, FB Marketplace, IG business tools).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- §04 Content calendar -->
+<section class="part" id="s04">
+  <div class="part-head">
+    <div class="part-num">§ 04</div>
+    <div>
+      <h2 class="part-title">Four weeks on LinkedIn — <em>a public letter, in daily installments</em></h2>
+      <p class="part-dek">LinkedIn is chosen on purpose: it is the one network where European policymakers, founders, and culture editors still actually read. One post a day, Monday to Sunday. Topic · angle · visual for each. Sunday posts are long-form articles.</p>
+    </div>
+  </div>
+
+  <div class="calendar-meta">
+    <div class="m"><div class="n">Cadence</div><div class="t">7 posts / week · 28 total</div></div>
+    <div class="m"><div class="n">Format</div><div class="t">Text + 1 visual · article on Sundays</div></div>
+    <div class="m"><div class="n">Voice</div><div class="t">Editorial, measured, European</div></div>
+    <div class="m"><div class="n">Author</div><div class="t">Founder · Mnemonic Studio</div></div>
+  </div>
+
+  <!-- WEEK 1 -->
+  <div class="week">
+    <div class="week-head">
+      <div class="wn">Week 01</div>
+      <div class="wt"><em>Why</em> — the manifesto</div>
+    </div>
+    <div class="posts">
+      <div class="post"><div class="day">Mon</div><div class="tag">Manifesto</div><div class="topic">Why we are building Memonic</div><div class="angle">Founder letter: social media works; it is only the user experience that is broken. Build in public from day one.</div><div class="visual">Portrait of founder at a desk; handwritten wordmark sketch alongside.</div></div>
+      <div class="post"><div class="day">Tue</div><div class="tag">Tagline</div><div class="topic">"Connect Europe" — unpacked</div><div class="angle">Europe has 24 official languages and one nervous system. The incumbents serve neither. Here is what a European default feels like.</div><div class="visual">Line map of EU with thin red arcs between cities.</div></div>
+      <div class="post"><div class="day">Wed</div><div class="tag">Product idea</div><div class="topic">The circle problem</div><div class="angle">You do not have ten thousand friends. You have twelve. Every platform pretends otherwise; we do not.</div><div class="visual">Concentric circles of trust, annotated like a physics diagram.</div></div>
+      <div class="post"><div class="day">Thu</div><div class="tag">Product idea</div><div class="topic">The text-vs-image false choice</div><div class="angle">Instagram punishes words. X punishes pictures. Memonic lets both live as equal cards in the same feed.</div><div class="visual">Side-by-side card mockups (one text, one photo) at identical visual weight.</div></div>
+      <div class="post"><div class="day">Fri</div><div class="tag">Principle</div><div class="topic">Privacy is a default, not a feature</div><div class="angle">Default-public is a business model. We default to your circle; public is an opt-in, and that changes everything downstream.</div><div class="visual">Toggle UI close-up: "public / circle" — circle is the pre-selected option.</div></div>
+      <div class="post"><div class="day">Sat</div><div class="tag">Europe</div><div class="topic">Hosting is a design decision</div><div class="angle">Your posts live in Frankfurt, not Oregon. That is not back-office trivia — it is the product.</div><div class="visual">Map pin illustrations on Frankfurt &amp; Amsterdam, European grid lines behind.</div></div>
+      <div class="post"><div class="day">Sun</div><div class="tag">Long-form</div><div class="topic">"Social media is broken — here is what we want to fix." (800 words)</div><div class="angle">LinkedIn Article. Synthesises the week: circle-default, text-image parity, European construction. Links to waitlist.</div><div class="visual">Editorial hero photograph — European window light on a reading chair.</div></div>
+    </div>
+  </div>
+
+  <!-- WEEK 2 -->
+  <div class="week">
+    <div class="week-head">
+      <div class="wn">Week 02</div>
+      <div class="wt"><em>What</em> — the product, demonstrated</div>
+    </div>
+    <div class="posts">
+      <div class="post"><div class="day">Mon</div><div class="tag">Demo</div><div class="topic">The composer, shown</div><div class="angle">One input, two equal outputs. Ten seconds of motion is worth a thousand words of marketing.</div><div class="visual">Short looping GIF: composer switching between text and image modes.</div></div>
+      <div class="post"><div class="day">Tue</div><div class="tag">Feature</div><div class="topic">Pick your audience before you type</div><div class="angle">Most apps make you post, then regret. Memonic makes you choose "family · 12 people" first. The feed feels different immediately.</div><div class="visual">UI screenshot of audience selector with a named circle highlighted.</div></div>
+      <div class="post"><div class="day">Wed</div><div class="tag">Feature</div><div class="topic">Chronological by default</div><div class="angle">There is no algorithm. Your feed is your circle, in time order. That is a feature we paid for by saying no.</div><div class="visual">Timeline graphic with clock faces at each post.</div></div>
+      <div class="post"><div class="day">Thu</div><div class="tag">Trust</div><div class="topic">Where our ad label goes</div><div class="angle">X puts "Ad" where the timestamp goes. We put "Advertisement" where the username goes. You will not miss it.</div><div class="visual">Ad card mockup, full-width "ADVERTISEMENT" in the author slot.</div></div>
+      <div class="post"><div class="day">Fri</div><div class="tag">Feature</div><div class="topic">A dot means a friend is around</div><div class="angle">Presence is the last honest signal the old internet had. We are bringing it back — nothing more than that.</div><div class="visual">Close-up of the presence dot UI, annotated.</div></div>
+      <div class="post"><div class="day">Sat</div><div class="tag">Principle</div><div class="topic">No public like counts</div><div class="angle">The author sees the numbers. Viewers do not. Performance pressure falls off a cliff and the posts get more honest.</div><div class="visual">Before/after UI comparison — public counts crossed out, private counts visible.</div></div>
+      <div class="post"><div class="day">Sun</div><div class="tag">Long-form</div><div class="topic">"Five product choices the big platforms cannot copy." (article)</div><div class="angle">Enumerated list with reasoning: circle default, ad labelling, no public likes, chronological feed, text-image parity.</div><div class="visual">Numbered 1–5 poster in Fraunces italic; oxblood numerals on warm off-white.</div></div>
+    </div>
+  </div>
+
+  <!-- WEEK 3 -->
+  <div class="week">
+    <div class="week-head">
+      <div class="wn">Week 03</div>
+      <div class="wt"><em>Where</em> — European by construction</div>
+    </div>
+    <div class="posts">
+      <div class="post"><div class="day">Mon</div><div class="tag">Made in EU · 1</div><div class="topic">Frankfurt: where your data lives</div><div class="angle">Short studio-visit post from the Hetzner facility. Name the data controller. Name the auditor. Name the city.</div><div class="visual">Documentary-style photograph of data-centre exterior; small EU flag annotation.</div></div>
+      <div class="post"><div class="day">Tue</div><div class="tag">Made in EU · 2</div><div class="topic">Lisbon: the engineering team</div><div class="angle">Introduce three engineers by name. European faces, European bios, shared language about craft.</div><div class="visual">Group photo on a Lisbon rooftop; hand-labelled typographic caption beneath.</div></div>
+      <div class="post"><div class="day">Wed</div><div class="tag">Policy</div><div class="topic">GDPR as a design brief, not a checkbox</div><div class="angle">We read the regulation and treated it as a source text. Show one specific UI decision that fell out of it.</div><div class="visual">Side-by-side: EU flag motif + the Memonic privacy shield icon.</div></div>
+      <div class="post"><div class="day">Thu</div><div class="tag">Language</div><div class="topic">Twenty-four first-class languages</div><div class="angle">Locale is not a footer dropdown. Demonstrate a feed switching between Romanian, Dutch, Estonian in the same session.</div><div class="visual">Three stacked feed mockups, same layout, three languages.</div></div>
+      <div class="post"><div class="day">Fri</div><div class="tag">Brand</div><div class="topic">What digital piazzas should feel like</div><div class="angle">European cities have real public squares. Your phone does not. We are trying to close that gap.</div><div class="visual">Dusk photograph of a real European piazza — Bologna, Kraków, Porto.</div></div>
+      <div class="post"><div class="day">Sat</div><div class="tag">Beta city</div><div class="topic">Beta city № 1 — Timișoara</div><div class="angle">The first 500 invites go to one city. Say why publicly; show the local newspapers carrying the story.</div><div class="visual">Timișoara skyline with a small Memonic wordmark overlay at upper-left.</div></div>
+      <div class="post"><div class="day">Sun</div><div class="tag">Long-form</div><div class="topic">Sunday interview: "What is missing from social media, from a European desk." (article, Q&amp;A)</div><div class="angle">Guest Q&amp;A with a European journalist or sociologist. 1,200 words; lets us not be the only voice in the room.</div><div class="visual">Editorial portrait of the interviewee, square crop, black-and-white.</div></div>
+    </div>
+  </div>
+
+  <!-- WEEK 4 -->
+  <div class="week">
+    <div class="week-head">
+      <div class="wn">Week 04</div>
+      <div class="wt"><em>When</em> — launch runway</div>
+    </div>
+    <div class="posts">
+      <div class="post"><div class="day">Mon</div><div class="tag">Waitlist</div><div class="topic">The waitlist opens — 5,000 seats</div><div class="angle">One invite per person. No referral math, no viral loops. Treat the seat as a real object.</div><div class="visual">Ticket illustration: "MEMONIC · SEAT 0001 · EDITION I".</div></div>
+      <div class="post"><div class="day">Tue</div><div class="tag">Community</div><div class="topic">Meet your first three circles</div><div class="angle">Three early users; who they chose to bring; a handwritten circle diagram each.</div><div class="visual">Triptych of portrait + hand-drawn circle alongside each.</div></div>
+      <div class="post"><div class="day">Wed</div><div class="tag">Boundary-setting</div><div class="topic">What Memonic is not</div><div class="angle">Not a Twitter clone. Not Instagram. Not Mastodon. Short, confident, quotable.</div><div class="visual">Oversized typographic "NOT" in Fraunces; three crossed-out competitor wordmarks below.</div></div>
+      <div class="post"><div class="day">Thu</div><div class="tag">Press</div><div class="topic">What European outlets are saying</div><div class="angle">Round-up of coverage once earned. Three quotes, three outlets, hyperlinked. No inflation.</div><div class="visual">Logo wall (Le Monde, Der Spiegel, Sifted, etc. — as earned).</div></div>
+      <div class="post"><div class="day">Fri</div><div class="tag">Live</div><div class="topic">Founder AMA on LinkedIn Live</div><div class="angle">Thirty minutes, any question, no moderator. Publish the chat transcript afterwards.</div><div class="visual">Lower-third broadcast graphic in Memonic colours.</div></div>
+      <div class="post"><div class="day">Sat</div><div class="tag">Editorial</div><div class="topic">Weekend reflection — "On keeping attention public"</div><div class="angle">Short, almost-literary. A meditation on why public attention matters, without selling anything.</div><div class="visual">Single minimalist typographic post — no photograph.</div></div>
+      <div class="post"><div class="day">Sun</div><div class="tag">Launch day</div><div class="topic">"Today we open Memonic. Thank you for waiting."</div><div class="angle">Launch post. Name the city count, the language count, the waitlist number, the one engineer who shipped last.</div><div class="visual">Community portrait or the full logo at rest on the warm paper canvas.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- §05 Landing page recommendations -->
+<section class="part" id="s05">
+  <div class="part-head">
+    <div class="part-num">§ 05</div>
+    <div>
+      <h2 class="part-title">Landing page — <em>seven corrections</em></h2>
+      <p class="part-dek">Every item below answers a specific failure we watched the incumbents commit. Each can be shipped independently; do them in order if in doubt.</p>
+    </div>
+  </div>
+
+  <div class="recs">
+    <div class="rec">
+      <h4>Lead the hero with the privacy promise</h4>
+      <p>Facebook's hero "Explore the things you love" is buried under a cookie dialog; X has no promise at all. Replace our hero with a one-sentence data-sovereignty claim: <em>"A social network that belongs to you — hosted in the European Union."</em> Put the waitlist CTA immediately beneath.</p>
+      <p class="src">Cf. Facebook hero occlusion · X empty hero</p>
+    </div>
+    <div class="rec">
+      <h4>Show the text-and-image composer in motion</h4>
+      <p>Don't describe product parity — demonstrate it. Embed a 6-second looping video of the composer switching between a 300-character text card and a single-image card, both rendering at identical visual weight. This is the feature the incumbents cannot copy cheaply.</p>
+      <p class="src">Cf. Instagram has no text composer</p>
+    </div>
+    <div class="rec">
+      <h4>Visualise the circle default</h4>
+      <p>A small animated diagram: a user posts, and the post travels to 14 named avatars (not 14,000). Caption: <em>"Your circle — not the internet."</em> This is the single clearest differentiator against the three incumbents' broadcast defaults.</p>
+      <p class="src">Cf. FB/X/IG all default to broadcast</p>
+    </div>
+    <div class="rec">
+      <h4>Put the language picker in the hero</h4>
+      <p>All three competitors relegate language to the footer. Move ours to the top navigation, with the six largest EU languages visible and the rest behind "Alte limbi · More languages." The page itself should respect <code>navigator.language</code> on first paint.</p>
+      <p class="src">Cf. Facebook footer-only language chooser</p>
+    </div>
+    <div class="rec">
+      <h4>Replace the cookie banner with a consent flow that is part of the product</h4>
+      <p>Our first-time overlay should read like an onboarding step, not a legal tax — labelled options, honest defaults, and a visible line that says which choice is pre-selected and why. X ships a persistent in-product cookie bar even to logged-in EU users; we can win trust just by not doing that.</p>
+      <p class="src">Cf. X in-product cookie banner · FB overlay blocks hero</p>
+    </div>
+    <div class="rec">
+      <h4>Ship a live "made in EU" trust widget</h4>
+      <p>A small, permanently visible block (sidebar or footer-anchor, never closeable) that shows: hosting region (Frankfurt + Amsterdam), data controller name, last independent audit date, and a link to the current subprocessor list. Make the technical facts the marketing copy.</p>
+      <p class="src">Cf. none of the three show origin</p>
+    </div>
+    <div class="rec">
+      <h4>Publish pricing — including a visible €0 tier</h4>
+      <p>X's landing page does not mention money; its logged-in product opens with a Premium upsell. That is bait-and-switch. Memonic's landing page should show pricing from the start: free tier (unlimited, no ads), paid tier (€4/month, team circles), pricing in euros, VAT line included. Trust is built by showing the bill before the signup.</p>
+      <p class="src">Cf. X Premium upsell inside the product</p>
+    </div>
+  </div>
+</section>
+
+<!-- §06 Acquisition -->
+<section class="part" id="s06">
+  <div class="part-head">
+    <div class="part-num">§ 06</div>
+    <div>
+      <h2 class="part-title">Acquisition — <em>five European moves</em></h2>
+      <p class="part-dek">Not growth hacks. Five tactics that assume Europe is a plural market of cities and communities, not a single funnel.</p>
+    </div>
+  </div>
+
+  <div class="acq">
+    <div class="acq-row">
+      <div class="n">01</div>
+      <div>
+        <h4>City-by-city invite waves, not pan-European at once</h4>
+        <p class="how">Open five beta cities in sequence — Timișoara, Lisbon, Tallinn, Ghent, Bologna — with 500 invites each. Each city gets a local coordinator, a local launch event, and regional press coverage in that city's language. We learn faster and the product feels like it comes from somewhere.</p>
+      </div>
+      <div class="why">Pan-European launches become pan-European silence. Concentrated density in one city produces the actual shape the product was designed for: small circles that overlap.</div>
+    </div>
+
+    <div class="acq-row">
+      <div class="n">02</div>
+      <div>
+        <h4>Creator seeding — 100 photographers · 100 writers</h4>
+        <p class="how">Hand-pick one hundred European photographers and one hundred European writers as launch members. The split is the message: we literally value images and words equally, and the seed content proves it on day one.</p>
+      </div>
+      <div class="why">Every social product's first thousand posts set the tone forever. A balanced seed is how we avoid becoming "another Instagram" or "another X" within the first month.</div>
+    </div>
+
+    <div class="acq-row">
+      <div class="n">03</div>
+      <div>
+        <h4>A weekly newsletter curated by a human</h4>
+        <p class="how">"Memonic Weekly" — a Friday editorial email, one per week, each edition anchored on one European city. Includes one circle post of the week, one written reflection, one photograph, one link to something worth reading elsewhere. Free. No paywall. Shareable.</p>
+      </div>
+      <div class="why">Newsletters compound. LinkedIn posts decay. A weekly email gives us a channel we own, a reason to stay editorial, and a benchmark the incumbents cannot replicate (their scale makes curation impossible).</div>
+    </div>
+
+    <div class="acq-row">
+      <div class="n">04</div>
+      <div>
+        <h4>University partnerships — verified student communities</h4>
+        <p class="how">Offer Memonic free to verified students at twenty European universities. Each university gets its own verified-student circle by default, ad-free, moderated by students. Partner with student unions; present at three freshers' weeks per term.</p>
+      </div>
+      <div class="why">Students graduate. Habits travel. Meta and X are too ad-funded to offer genuinely ad-free university spaces; we can. The 15–70 audience brief starts, realistically, with the younger half.</div>
+    </div>
+
+    <div class="acq-row">
+      <div class="n">05</div>
+      <div>
+        <h4>A poster campaign in European train stations</h4>
+        <p class="how">Physical posters at six major stations — Berlin Hbf, Gare du Nord, Milano Centrale, Amsterdam Centraal, Barcelona Sants, București Nord. Single typographic poster, one sentence, one QR code. Example: <em>"The 2:14 to Vienna carries 800 conversations. What if they stayed?"</em></p>
+      </div>
+      <div class="why">Train stations are the most European public space that still exists. Getting the brand into that context, not on Instagram reels, is how Memonic earns the "made on this continent" claim instead of just saying it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- §07 Quick Wins -->
+<section class="part" id="s07">
+  <div class="part-head">
+    <div class="part-num">§ 07</div>
+    <div>
+      <h2 class="part-title">Quick wins — <em>three things to ship this week</em></h2>
+      <p class="part-dek">Each of these is achievable between now and Friday. They do not wait for the plan; they are the plan beginning.</p>
+    </div>
+  </div>
+
+  <div class="wins">
+    <div class="win">
+      <div class="when">Day 1 — Tuesday</div>
+      <h4>Rewrite the landing-page hero — and put the language picker in the top nav.</h4>
+      <p>Replace whatever is in the hero today with: <em>"A social network that belongs to you. Hosted in the European Union."</em> Move the language picker from the footer to the top navigation. Two lines of HTML, one of copy, one hour of work. The single change that best signals what Memonic is.</p>
+      <div class="eta">ETA · 2 hours · Design + copy</div>
+    </div>
+    <div class="win">
+      <div class="when">Day 2 — Wednesday</div>
+      <h4>Publish the Week-1 Manifesto post on LinkedIn.</h4>
+      <p>Three hundred words under the headline <em>"Why we are building Memonic."</em> No product screenshots. A photograph of the founder at a desk. Links to the waitlist and the domain. This seeds every Monday post for the rest of the month and gives the press something to quote by the weekend.</p>
+      <div class="eta">ETA · 4 hours · Write, edit, photograph, post</div>
+    </div>
+    <div class="win">
+      <div class="when">Day 3 — Thursday</div>
+      <h4>Reserve memonic.eu and provision EU hosting.</h4>
+      <p>Register <code>memonic.eu</code> alongside the existing .com. Spin up Hetzner Frankfurt + Amsterdam as primary regions, point DNS. By Friday the domain, the hosting region, and the privacy copy all tell the same story — which is the point of the brand.</p>
+      <div class="eta">ETA · 1 day · Devops + legal</div>
+    </div>
+  </div>
+</section>
+
+<!-- §08 Colophon -->
+<footer class="colophon" id="s08">
+  <div class="colo-grid">
+    <div>
+      <h5>Primary KPI</h5>
+      <p><strong>10,000 verified members across five beta cities</strong> by end of Week 12. Secondary: 5,000 LinkedIn newsletter subscribers; 30 press mentions in European outlets; founder posts averaging &gt; 3,000 impressions each.</p>
+    </div>
+    <div>
+      <h5>Risks to watch</h5>
+      <p>Pan-European launch without city density · text-image parity that looks equal in marketing but not in UI · ad-free promise without a sustainable paid tier · language picker that covers six languages instead of twenty-four.</p>
+    </div>
+    <div>
+      <h5>Next steps</h5>
+      <p>Approve tagline. Sign off hero copy. Commission the six train-station posters. Draft the Timișoara coordinator job description. Invite the first ten photographers before Friday.</p>
+    </div>
+  </div>
+
+  <p class="signoff">Set in Fraunces &amp; IBM Plex. Printed on warm paper, hosted in <em>Frankfurt</em>. Mnemonic Studio, April 2026.</p>
+</footer>
+
+</div><!-- /wrap -->
+
+</body>
+</html>
