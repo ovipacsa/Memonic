@@ -10,11 +10,10 @@ export default async function NutritionPage() {
   const session = await getSession();
   if (!session) redirect("/home");
 
-  const db = getDb();
-  const meRow = db
-    .prepare("SELECT id, display_name FROM users WHERE id = ?")
-    .get(session.userId) as Pick<UserRow, "id" | "display_name"> | undefined;
-
+  const sql = getDb();
+  const [meRow] = await sql<Pick<UserRow, "id"|"display_name">[]>`
+    SELECT user_id AS id, display_name FROM users WHERE user_id = ${session.userId}::uuid
+  `;
   if (!meRow) redirect("/home");
 
   return (
