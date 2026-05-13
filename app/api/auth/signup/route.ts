@@ -3,18 +3,14 @@ import { getDb } from "@/lib/db";
 import { signupSchema } from "@/lib/schemas";
 import { hashPassword } from "@/lib/password";
 import { isOldEnough, computeAge, MIN_AGE } from "@/lib/age";
-import { id } from "@/lib/cuid";
 import { setSessionCookie } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   let payload: unknown;
-  try {
-    payload = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+  try { payload = await req.json(); }
+  catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
   const parsed = signupSchema.safeParse(payload);
   if (!parsed.success) {
@@ -33,11 +29,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const db = getDb();
+  const sql = getDb();
 
-  const emailExists = db
-    .prepare("SELECT id FROM users WHERE email = ?")
-    .get(v.email.toLowerCase());
+  const [emailExists] = await sql`
+    SELECT user_id FROM users WHERE LOWER(email) = LOWER(${v.email})
+  `;
   if (emailExists) {
     return NextResponse.json(
       { error: "An account already exists for that email." },
@@ -45,9 +41,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const socialExists = db
-    .prepare("SELECT id FROM users WHERE country = ? AND social_number = ?")
-    .get(v.country, v.socialNumber);
+  const [socialExists] = await sql`
+    SELECT user_id FROM users
+    WHERE country = ${v.country} AND social_number = ${v.socialNumber}
+  `;
   if (socialExists) {
     return NextResponse.json(
       { error: "A Memonic account already exists for that country and social number." },
@@ -55,32 +52,20 @@ export async function POST(req: Request) {
     );
   }
 
-  const userId = id();
   const passwordHash = await hashPassword(v.password);
-  const createdAt = new Date().toISOString();
   const displayName = `${v.firstName} ${v.familyName}`.trim();
 
-  db.prepare(
-    `INSERT INTO users
-      (id, email, password_hash, display_name, first_name, family_name, dob, photo, bio, city, country, social_number, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).run(
-    userId,
-    v.email.toLowerCase(),
-    passwordHash,
-    displayName,
-    v.firstName,
-    v.familyName,
-    v.dob,
-    v.photo ?? null,
-    null,
-    null,
-    v.country,
-    v.socialNumber,
-    createdAt
-  );
+  const [row] = await sql`
+    INSERT INTO users
+      (email, password_hash, display_name, first_name, family_name,
+       dob, photo, country, social_number)
+    VALUES
+      (LOWER(${v.email}), ${passwordHash}, ${displayName},
+       ${v.firstName}, ${v.familyName},
+       ${v.dob}::date, ${v.photo ?? null}, ${v.country}, ${v.socialNumber})
+    RETURNING user_id AS id
+  `;
 
-  await setSessionCookie(userId);
-
-  return NextResponse.json({ ok: true, userId });
+  await setSessionCookie(row.id);
+  return NextResponse.json({ ok: true, userId: row.id });
 }
