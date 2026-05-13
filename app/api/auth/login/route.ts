@@ -8,11 +8,8 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   let payload: unknown;
-  try {
-    payload = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+  try { payload = await req.json(); }
+  catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
   const parsed = loginSchema.safeParse(payload);
   if (!parsed.success) {
@@ -20,9 +17,13 @@ export async function POST(req: Request) {
   }
   const { email, password } = parsed.data;
 
-  const row = getDb()
-    .prepare("SELECT * FROM users WHERE email = ?")
-    .get(email.toLowerCase()) as UserRow | undefined;
+  const sql = getDb();
+  const [row] = await sql<UserRow[]>`
+    SELECT
+      user_id AS id, email, password_hash, display_name, first_name, family_name,
+      dob::text, photo, bio, city, country, social_number, created_at::text
+    FROM users WHERE LOWER(email) = LOWER(${email})
+  `;
 
   if (!row) {
     return NextResponse.json({ error: "Email or password is incorrect." }, { status: 401 });
@@ -34,6 +35,5 @@ export async function POST(req: Request) {
   }
 
   await setSessionCookie(row.id);
-
   return NextResponse.json({ ok: true, userId: row.id });
 }
