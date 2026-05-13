@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { id } from "@/lib/cuid";
 
 export const runtime = "nodejs";
 
@@ -10,9 +9,8 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   let payload: unknown;
-  try { payload = await req.json(); } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+  try { payload = await req.json(); }
+  catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
   const { userId: targetId } = payload as { userId?: string };
   if (!targetId || typeof targetId !== "string") {
@@ -22,30 +20,21 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Cannot block yourself" }, { status: 400 });
   }
 
-  const db = getDb();
-  const blockedUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-  const now = new Date().toISOString();
+  const sql = getDb();
+  const blockedUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-  // Upsert block (refresh timer if already blocked)
-  const existing = db.prepare(
-    "SELECT id FROM user_blocks WHERE blocker_id = ? AND blocked_id = ?"
-  ).get(session.userId, targetId);
+  await sql`
+    INSERT INTO user_blocks (blocker_id, blocked_id, blocked_until)
+    VALUES (${session.userId}::uuid, ${targetId}::uuid, ${blockedUntil})
+    ON CONFLICT (blocker_id, blocked_id)
+    DO UPDATE SET blocked_until = EXCLUDED.blocked_until, created_at = now()
+  `;
 
-  if (existing) {
-    db.prepare(
-      "UPDATE user_blocks SET blocked_until = ?, created_at = ? WHERE blocker_id = ? AND blocked_id = ?"
-    ).run(blockedUntil, now, session.userId, targetId);
-  } else {
-    db.prepare(
-      "INSERT INTO user_blocks (id, blocker_id, blocked_id, blocked_until, created_at) VALUES (?, ?, ?, ?, ?)"
-    ).run(id(), session.userId, targetId, blockedUntil, now);
-  }
+  await sql`
+    DELETE FROM friend_requests
+    WHERE (from_user_id = ${session.userId}::uuid AND to_user_id = ${targetId}::uuid)
+       OR (from_user_id = ${targetId}::uuid AND to_user_id = ${session.userId}::uuid)
+  `;
 
-  // Remove any existing friendship between the two users
-  db.prepare(
-    `DELETE FROM friend_requests
-     WHERE (from_user_id = ? AND to_user_id = ?) OR (from_user_id = ? AND to_user_id = ?)`
-  ).run(session.userId, targetId, targetId, session.userId);
-
-  return NextResponse.json({ ok: true, blockedUntil });
+  return NextResponse.json({ ok: true, blockedUntil: blockedUntil.toISOString() });
 }
