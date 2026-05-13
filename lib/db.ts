@@ -1,154 +1,25 @@
-import { DatabaseSync } from "node:sqlite";
-import { mkdirSync, existsSync } from "node:fs";
-import { join } from "node:path";
-
-const DATA_DIR = join(process.cwd(), "data");
-if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-
-const DB_PATH = join(DATA_DIR, "memonic.db");
+import postgres from "postgres";
 
 declare global {
   // eslint-disable-next-line no-var
-  var __memonicDb: DatabaseSync | undefined;
+  var __memonicSql: postgres.Sql | undefined;
 }
 
-function bootstrap(d: DatabaseSync) {
-  d.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id            TEXT PRIMARY KEY,
-      email         TEXT NOT NULL UNIQUE,
-      password_hash TEXT NOT NULL,
-      display_name  TEXT NOT NULL,
-      first_name    TEXT,
-      family_name   TEXT,
-      dob           TEXT NOT NULL,
-      photo         TEXT,
-      bio           TEXT,
-      city          TEXT,
-      country       TEXT,
-      social_number TEXT,
-      created_at    TEXT NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS posts (
-      id            TEXT PRIMARY KEY,
-      user_id       TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      type          TEXT NOT NULL CHECK (type IN ('text','image')),
-      body          TEXT,
-      image         TEXT,
-      created_at    TEXT NOT NULL,
-      client_locale TEXT,
-      char_count    INTEGER,
-      word_count    INTEGER,
-      image_w       INTEGER,
-      image_h       INTEGER,
-      image_kb      INTEGER
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_posts_created ON posts(created_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_posts_user ON posts(user_id);
-
-    CREATE TABLE IF NOT EXISTS nutrition_logs (
-      id         TEXT PRIMARY KEY,
-      user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      food_name  TEXT NOT NULL,
-      portion    TEXT,
-      calories   REAL NOT NULL,
-      protein_g  REAL,
-      carbs_g    REAL,
-      fat_g      REAL,
-      notes      TEXT,
-      source     TEXT NOT NULL DEFAULT 'text',
-      log_date   TEXT NOT NULL,
-      logged_at  TEXT NOT NULL
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_nutrition_user_date ON nutrition_logs(user_id, log_date);
-
-    CREATE TABLE IF NOT EXISTS friend_requests (
-      id           TEXT PRIMARY KEY,
-      from_user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      to_user_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      status       TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted','declined')),
-      created_at   TEXT NOT NULL,
-      responded_at TEXT,
-      UNIQUE(from_user_id, to_user_id)
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_fr_to_user ON friend_requests(to_user_id, status);
-    CREATE INDEX IF NOT EXISTS idx_fr_from_user ON friend_requests(from_user_id, status);
-
-    CREATE TABLE IF NOT EXISTS user_blocks (
-      id            TEXT PRIMARY KEY,
-      blocker_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      blocked_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      blocked_until TEXT NOT NULL,
-      created_at    TEXT NOT NULL,
-      UNIQUE(blocker_id, blocked_id)
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_blocks_blocker ON user_blocks(blocker_id, blocked_until);
-  `);
-
-  // Migration: create tables that may not exist in older DB files
-  const tablesMigrate = [
-    `CREATE TABLE IF NOT EXISTS user_blocks (
-      id            TEXT PRIMARY KEY,
-      blocker_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      blocked_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      blocked_until TEXT NOT NULL,
-      created_at    TEXT NOT NULL,
-      UNIQUE(blocker_id, blocked_id)
-    )`,
-    `CREATE INDEX IF NOT EXISTS idx_blocks_blocker ON user_blocks(blocker_id, blocked_until)`,
-    `CREATE TABLE IF NOT EXISTS friend_requests (
-      id           TEXT PRIMARY KEY,
-      from_user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      to_user_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      status       TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted','declined')),
-      created_at   TEXT NOT NULL,
-      responded_at TEXT,
-      UNIQUE(from_user_id, to_user_id)
-    )`,
-    `CREATE INDEX IF NOT EXISTS idx_fr_to_user ON friend_requests(to_user_id, status)`,
-    `CREATE INDEX IF NOT EXISTS idx_fr_from_user ON friend_requests(from_user_id, status)`,
-  ];
-  for (const sql of tablesMigrate) {
-    try { d.exec(sql); } catch { /* already exists */ }
+export function getDb(): postgres.Sql {
+  if (!globalThis.__memonicSql) {
+    const url = process.env.DATABASE_URL;
+    if (!url) throw new Error("DATABASE_URL environment variable is not set");
+    globalThis.__memonicSql = postgres(url, { max: 10 });
   }
-
-  // Migration: add new columns if they don't exist yet (SQLite ALTER TABLE is append-only)
-  const migrate = [
-    "ALTER TABLE users ADD COLUMN first_name TEXT",
-    "ALTER TABLE users ADD COLUMN family_name TEXT",
-    "ALTER TABLE users ADD COLUMN country TEXT",
-    "ALTER TABLE users ADD COLUMN social_number TEXT",
-  ];
-  for (const sql of migrate) {
-    try { d.exec(sql); } catch { /* column already exists */ }
-  }
-
-  // Unique constraint: one social_number per country
-  try {
-    d.exec(`
-      CREATE UNIQUE INDEX IF NOT EXISTS idx_users_country_social
-        ON users(country, social_number)
-        WHERE country IS NOT NULL AND social_number IS NOT NULL
-    `);
-  } catch { /* index already exists */ }
+  return globalThis.__memonicSql;
 }
 
-export function getDb(): DatabaseSync {
-  if (!globalThis.__memonicDb) {
-    const d = new DatabaseSync(DB_PATH);
-    bootstrap(d);
-    globalThis.__memonicDb = d;
-  }
-  return globalThis.__memonicDb;
-}
+// All `id` fields are aliased PKs in SELECT queries (e.g. user_id AS id).
+// BIGINT PKs come back as strings from postgres.js by default — kept as string
+// to avoid breaking frontend components.
 
 export type UserRow = {
-  id: string;
+  id: string;           // UUID, aliased from user_id
   email: string;
   password_hash: string;
   display_name: string;
@@ -164,7 +35,7 @@ export type UserRow = {
 };
 
 export type PostRow = {
-  id: string;
+  id: string;           // BIGINT, aliased from post_id
   user_id: string;
   type: "text" | "image";
   body: string | null;
@@ -184,8 +55,16 @@ export type FeedItem = PostRow & {
   author_city: string | null;
 };
 
+export type PersonEntry = {
+  id: string;           // UUID, aliased from user_id
+  display_name: string;
+  city: string | null;
+  country: string | null;
+  photo: string | null;
+};
+
 export type FriendRequestRow = {
-  id: string;
+  id: string;           // BIGINT, aliased from request_id
   from_user_id: string;
   to_user_id: string;
   status: "pending" | "accepted" | "declined";
@@ -199,7 +78,7 @@ export type FriendRequestWithSender = FriendRequestRow & {
 };
 
 export type UserBlockRow = {
-  id: string;
+  id: string;           // BIGINT, aliased from block_id
   blocker_id: string;
   blocked_id: string;
   blocked_until: string;
@@ -207,7 +86,7 @@ export type UserBlockRow = {
 };
 
 export type NutritionLogRow = {
-  id: string;
+  id: string;           // BIGINT, aliased from log_id
   user_id: string;
   food_name: string;
   portion: string | null;
