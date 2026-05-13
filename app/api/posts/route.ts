@@ -2,34 +2,46 @@ import { NextResponse } from "next/server";
 import { getDb, type FeedItem } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { newPostSchema } from "@/lib/schemas";
-import { id } from "@/lib/cuid";
 import { wordCount } from "@/lib/format";
 
 export const runtime = "nodejs";
 
 const FEED_LIMIT = 100;
-const MAX_IMAGE_BYTES = 800 * 1024; // 800 KB
+const MAX_IMAGE_BYTES = 800 * 1024;
 
-const FEED_QUERY = `
-  SELECT
-    p.id, p.user_id, p.type, p.body, p.image, p.created_at,
-    p.client_locale, p.char_count, p.word_count,
-    p.image_w, p.image_h, p.image_kb,
-    u.display_name AS author_display_name,
-    u.photo        AS author_photo,
-    u.city         AS author_city
-  FROM posts p
-  JOIN users u ON u.id = p.user_id
-  ORDER BY p.created_at DESC
-  LIMIT ?
+const FEED_SELECT = `
+  p.post_id::text AS id, p.user_id::text, p.type, p.body, p.image,
+  p.created_at::text, p.client_locale, p.char_count, p.word_count,
+  p.image_w, p.image_h, p.image_kb,
+  u.display_name AS author_display_name,
+  u.photo        AS author_photo,
+  u.city         AS author_city
 `;
 
 export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-  const rows = getDb().prepare(FEED_QUERY).all(FEED_LIMIT) as FeedItem[];
-  return NextResponse.json({ posts: rows });
+  const sql = getDb();
+  const posts = await sql<FeedItem[]>`
+    SELECT ${sql.unsafe(FEED_SELECT)}
+    FROM posts p
+    JOIN users u ON u.user_id = p.user_id
+    WHERE p.user_id = ${session.userId}::uuid
+       OR p.user_id IN (
+         SELECT CASE
+           WHEN from_user_id = ${session.userId}::uuid THEN to_user_id
+           ELSE from_user_id
+         END
+         FROM friend_requests
+         WHERE status = 'accepted'
+           AND (from_user_id = ${session.userId}::uuid OR to_user_id = ${session.userId}::uuid)
+       )
+    ORDER BY p.created_at DESC
+    LIMIT ${FEED_LIMIT}
+  `;
+
+  return NextResponse.json({ posts });
 }
 
 export async function POST(req: Request) {
@@ -37,11 +49,8 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   let payload: unknown;
-  try {
-    payload = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+  try { payload = await req.json(); }
+  catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
   const parsed = newPostSchema.safeParse(payload);
   if (!parsed.success) {
@@ -53,59 +62,33 @@ export async function POST(req: Request) {
   const v = parsed.data;
 
   if (v.type === "image" && v.image) {
-    // base64 length to bytes: roughly len * 3/4
-    const approxBytes = Math.floor(v.image.length * 0.75);
-    if (approxBytes > MAX_IMAGE_BYTES) {
-      return NextResponse.json(
-        { error: "Image too large. Cap is 800 KB." },
-        { status: 413 }
-      );
+    if (Math.floor(v.image.length * 0.75) > MAX_IMAGE_BYTES) {
+      return NextResponse.json({ error: "Image too large. Cap is 800 KB." }, { status: 413 });
     }
   }
 
-  const postId = id();
-  const createdAt = new Date().toISOString();
+  const sql = getDb();
   const body = v.body?.trim() || null;
   const charCount = body ? body.length : null;
   const wcount = body ? wordCount(body) : null;
 
-  getDb()
-    .prepare(
-      `INSERT INTO posts
-        (id, user_id, type, body, image, created_at,
-         client_locale, char_count, word_count,
-         image_w, image_h, image_kb)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    )
-    .run(
-      postId,
-      session.userId,
-      v.type,
-      body,
-      v.type === "image" ? v.image ?? null : null,
-      createdAt,
-      v.clientLocale ?? null,
-      charCount,
-      wcount,
-      v.imageW ?? null,
-      v.imageH ?? null,
-      v.imageKb ?? null
-    );
+  const [inserted] = await sql`
+    INSERT INTO posts
+      (user_id, type, body, image, client_locale, char_count, word_count, image_w, image_h, image_kb)
+    VALUES
+      (${session.userId}::uuid, ${v.type}, ${body},
+       ${v.type === "image" ? (v.image ?? null) : null},
+       ${v.clientLocale ?? null}, ${charCount}, ${wcount},
+       ${v.imageW ?? null}, ${v.imageH ?? null}, ${v.imageKb ?? null})
+    RETURNING post_id
+  `;
 
-  const row = getDb()
-    .prepare(
-      `SELECT
-        p.id, p.user_id, p.type, p.body, p.image, p.created_at,
-        p.client_locale, p.char_count, p.word_count,
-        p.image_w, p.image_h, p.image_kb,
-        u.display_name AS author_display_name,
-        u.photo        AS author_photo,
-        u.city         AS author_city
-      FROM posts p
-      JOIN users u ON u.id = p.user_id
-      WHERE p.id = ?`
-    )
-    .get(postId) as FeedItem;
+  const [post] = await sql<FeedItem[]>`
+    SELECT ${sql.unsafe(FEED_SELECT)}
+    FROM posts p
+    JOIN users u ON u.user_id = p.user_id
+    WHERE p.post_id = ${inserted.post_id}
+  `;
 
-  return NextResponse.json({ post: row });
+  return NextResponse.json({ post });
 }
