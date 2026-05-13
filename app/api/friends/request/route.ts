@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { id } from "@/lib/cuid";
 
 export const runtime = "nodejs";
 
@@ -10,9 +9,8 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   let payload: unknown;
-  try { payload = await req.json(); } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+  try { payload = await req.json(); }
+  catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }
 
   const { toUserId } = payload as { toUserId?: string };
   if (!toUserId || typeof toUserId !== "string") {
@@ -22,32 +20,40 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Cannot befriend yourself" }, { status: 400 });
   }
 
-  const db = getDb();
+  const sql = getDb();
 
-  const target = db.prepare("SELECT id FROM users WHERE id = ?").get(toUserId);
+  const [target] = await sql`
+    SELECT user_id FROM users WHERE user_id = ${toUserId}::uuid
+  `;
   if (!target) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  // Check if blocked by target
-  const blocked = db.prepare(
-    "SELECT id FROM user_blocks WHERE blocker_id = ? AND blocked_id = ? AND blocked_until > datetime('now')"
-  ).get(toUserId, session.userId);
+  const [blocked] = await sql`
+    SELECT block_id FROM user_blocks
+    WHERE blocker_id = ${toUserId}::uuid
+      AND blocked_id = ${session.userId}::uuid
+      AND blocked_until > now()
+  `;
   if (blocked) return NextResponse.json({ error: "Cannot send request at this time" }, { status: 403 });
 
-  // Check existing request in either direction
-  const existing = db.prepare(
-    `SELECT id, status FROM friend_requests
-     WHERE (from_user_id = ? AND to_user_id = ?) OR (from_user_id = ? AND to_user_id = ?)`
-  ).get(session.userId, toUserId, toUserId, session.userId) as { id: string; status: string } | undefined;
-
+  const [existing] = await sql`
+    SELECT request_id, status FROM friend_requests
+    WHERE (from_user_id = ${session.userId}::uuid AND to_user_id = ${toUserId}::uuid)
+       OR (from_user_id = ${toUserId}::uuid AND to_user_id = ${session.userId}::uuid)
+  `;
   if (existing) {
-    if (existing.status === "accepted") return NextResponse.json({ error: "Already friends" }, { status: 409 });
-    if (existing.status === "pending") return NextResponse.json({ error: "Request already pending" }, { status: 409 });
+    if (existing.status === "accepted") {
+      return NextResponse.json({ error: "Already friends" }, { status: 409 });
+    }
+    if (existing.status === "pending") {
+      return NextResponse.json({ error: "Request already pending" }, { status: 409 });
+    }
   }
 
-  const requestId = id();
-  db.prepare(
-    "INSERT INTO friend_requests (id, from_user_id, to_user_id, status, created_at) VALUES (?, ?, ?, 'pending', ?)"
-  ).run(requestId, session.userId, toUserId, new Date().toISOString());
+  const [row] = await sql`
+    INSERT INTO friend_requests (from_user_id, to_user_id)
+    VALUES (${session.userId}::uuid, ${toUserId}::uuid)
+    RETURNING request_id::text AS id
+  `;
 
-  return NextResponse.json({ ok: true, requestId });
+  return NextResponse.json({ ok: true, requestId: row.id });
 }
