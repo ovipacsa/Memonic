@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
-import { getDb, type FeedItem, type UserRow } from "@/lib/db";
+import { getDb, type FeedItem, type UserRow, type PersonEntry } from "@/lib/db";
 import Masthead from "@/components/feed/Masthead";
 import ProfileRail from "@/components/feed/ProfileRail";
 import Feed from "@/components/feed/Feed";
 import DailyStats from "@/components/nutrition/DailyStats";
-import PeopleRail, { type PersonEntry } from "@/components/feed/PeopleRail";
+import PeopleRail from "@/components/feed/PeopleRail";
 
 export const dynamic = "force-dynamic";
 
@@ -13,71 +13,72 @@ export default async function FeedPage() {
   const session = await getSession();
   if (!session) redirect("/");
 
-  const db = getDb();
-  const meRow = db
-    .prepare(
-      "SELECT id, email, display_name, photo, bio, city, created_at FROM users WHERE id = ?"
-    )
-    .get(session.userId) as Pick<UserRow, "id" | "email" | "display_name" | "photo" | "bio" | "city" | "created_at"> | undefined;
+  const sql = getDb();
 
+  const [meRow] = await sql<Pick<UserRow, "id"|"email"|"display_name"|"photo"|"bio"|"city"|"created_at">[]>`
+    SELECT user_id AS id, email, display_name, photo, bio, city, created_at::text
+    FROM users WHERE user_id = ${session.userId}::uuid
+  `;
   if (!meRow) redirect("/");
-  const me = { ...meRow };
+  const me = meRow;
 
-  const peopleRows = db
-    .prepare(
-      `SELECT id, display_name, city, country, photo
-       FROM users
-       WHERE id != ?
-         AND id NOT IN (
-           SELECT blocked_id FROM user_blocks
-           WHERE blocker_id = ? AND blocked_until > datetime('now')
-         )
-         AND id NOT IN (
-           SELECT CASE WHEN from_user_id = ? THEN to_user_id ELSE from_user_id END
-           FROM friend_requests
-           WHERE status = 'accepted'
-             AND (from_user_id = ? OR to_user_id = ?)
-         )
-         AND id NOT IN (
-           SELECT to_user_id FROM friend_requests
-           WHERE from_user_id = ? AND status = 'pending'
-         )
-       ORDER BY RANDOM()
-       LIMIT 10`
-    )
-    .all(session.userId, session.userId, session.userId, session.userId, session.userId, session.userId) as PersonEntry[];
-  const people = peopleRows.map((p) => ({ ...p }));
+  const people = await sql<PersonEntry[]>`
+    SELECT user_id AS id, display_name, city, country, photo
+    FROM users
+    WHERE user_id != ${session.userId}::uuid
+      AND user_id NOT IN (
+        SELECT blocked_id FROM user_blocks
+        WHERE blocker_id = ${session.userId}::uuid AND blocked_until > now()
+      )
+      AND user_id NOT IN (
+        SELECT CASE
+          WHEN from_user_id = ${session.userId}::uuid THEN to_user_id
+          ELSE from_user_id
+        END
+        FROM friend_requests
+        WHERE status = 'accepted'
+          AND (from_user_id = ${session.userId}::uuid OR to_user_id = ${session.userId}::uuid)
+      )
+      AND user_id NOT IN (
+        SELECT to_user_id FROM friend_requests
+        WHERE from_user_id = ${session.userId}::uuid AND status = 'pending'
+      )
+    ORDER BY RANDOM()
+    LIMIT 10
+  `;
 
-  const postRows = db
-    .prepare(
-      `SELECT
-        p.id, p.user_id, p.type, p.body, p.image, p.created_at,
-        p.client_locale, p.char_count, p.word_count,
-        p.image_w, p.image_h, p.image_kb,
-        u.display_name AS author_display_name,
-        u.photo        AS author_photo,
-        u.city         AS author_city
-      FROM posts p
-      JOIN users u ON u.id = p.user_id
-      WHERE p.user_id = ?
-         OR p.user_id IN (
-           SELECT CASE WHEN from_user_id = ? THEN to_user_id ELSE from_user_id END
-           FROM friend_requests
-           WHERE status = 'accepted'
-             AND (from_user_id = ? OR to_user_id = ?)
-         )
-      ORDER BY p.created_at DESC
-      LIMIT 100`
-    )
-    .all(session.userId, session.userId, session.userId, session.userId) as FeedItem[];
-  const posts = postRows.map((p) => ({ ...p }));
+  const posts = await sql<FeedItem[]>`
+    SELECT
+      p.post_id::text AS id, p.user_id::text, p.type, p.body, p.image,
+      p.created_at::text, p.client_locale, p.char_count, p.word_count,
+      p.image_w, p.image_h, p.image_kb,
+      u.display_name AS author_display_name,
+      u.photo        AS author_photo,
+      u.city         AS author_city
+    FROM posts p
+    JOIN users u ON u.user_id = p.user_id
+    WHERE p.user_id = ${session.userId}::uuid
+       OR p.user_id IN (
+         SELECT CASE
+           WHEN from_user_id = ${session.userId}::uuid THEN to_user_id
+           ELSE from_user_id
+         END
+         FROM friend_requests
+         WHERE status = 'accepted'
+           AND (from_user_id = ${session.userId}::uuid OR to_user_id = ${session.userId}::uuid)
+       )
+    ORDER BY p.created_at DESC
+    LIMIT 100
+  `;
 
   const today = new Date().toISOString().split("T")[0];
-  const nutritionToday = db
-    .prepare(
-      "SELECT COALESCE(SUM(calories),0) as total_cal, COUNT(*) as entry_count FROM nutrition_logs WHERE user_id = ? AND log_date = ?"
-    )
-    .get(session.userId, today) as { total_cal: number; entry_count: number };
+  const [nutritionToday] = await sql<{ total_cal: number; entry_count: number }[]>`
+    SELECT
+      COALESCE(SUM(calories), 0)::float AS total_cal,
+      COUNT(*)::int AS entry_count
+    FROM nutrition_logs
+    WHERE user_id = ${session.userId}::uuid AND log_date = ${today}::date
+  `;
 
   return (
     <main className="px-[var(--gutter)] py-[clamp(28px,4vw,56px)]">
