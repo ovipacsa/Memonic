@@ -141,7 +141,6 @@ a:hover {
   line-height: 0.95;
   letter-spacing: 0.02em;
   color: var(--magenta);
-  font-size: clamp(36px, 16.6cqw, 138px);
   text-shadow:
     0 0 12px rgba(255, 0, 160, 0.55),
     0 0 28px rgba(255, 0, 160, 0.35),
@@ -150,14 +149,16 @@ a:hover {
 
 /* Replace Monoton's period (which renders as horizontal stripes) with a styled neon circle. */
 .wordmark .dot {
-  display: inline-block;
-  width: calc(0.4em - 6px);
-  height: calc(0.4em - 6px);
-  margin-left: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, calc(-50% + 12px));
+  display: block;
+  width: calc(0.4em - 14px);
+  height: calc(0.4em - 14px);
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   background: var(--cyan);
-  vertical-align: middle;
-  transform: translateY(-0.03em);
   box-shadow:
     0 0 12px rgba(0, 240, 255, 0.85),
     0 0 28px rgba(0, 240, 255, 0.55),
