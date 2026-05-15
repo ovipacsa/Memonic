@@ -1,14 +1,17 @@
 import type React from "react";
 import ReturnDot from "@/components/feed/ReturnDot";
+import FeedDot from "@/components/feed/FeedDot";
 import Link from "next/link";
 
 export default function Masthead({
   withReturn = false,
+  withFeedReturn = false,
   active = "feed",
   subtitle,
   rightSlot,
 }: {
   withReturn?: boolean;
+  withFeedReturn?: boolean;
   active?: "feed" | "nutrition";
   subtitle?: string;
   rightSlot?: React.ReactNode;
@@ -30,7 +33,11 @@ export default function Masthead({
         <div />
         <div>
           <h1 className="wordmark mt-3 text-center text-[clamp(16px,8.65vw,118px)] whitespace-nowrap">
-            {withReturn ? <>Mem<span className="relative inline-block">o<ReturnDot /></span>nic</> : "Memonic"}
+            {withReturn
+              ? <>Mem<span className="relative inline-block">o<ReturnDot /></span>nic</>
+              : withFeedReturn
+                ? <>Mem<span className="relative inline-block">o<FeedDot /></span>nic</>
+                : "Memonic"}
           </h1>
           <p className="terminal text-center mt-2 text-star-soft text-[clamp(16px,1.4vw,22px)]">
             {subtitle ?? "A small corner of the universe, observed honestly."}
