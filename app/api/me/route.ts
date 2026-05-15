@@ -10,7 +10,8 @@ export async function GET() {
 
   const sql = getDb();
   const [row] = await sql`
-    SELECT user_id AS id, email, display_name, dob::text, photo, bio, city, created_at::text
+    SELECT user_id AS id, email, display_name, dob::text, photo, bio, city, created_at::text,
+           weather_widget_visible
     FROM users WHERE user_id = ${session.userId}::uuid
   `;
 
