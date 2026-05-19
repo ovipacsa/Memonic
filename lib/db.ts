@@ -32,6 +32,7 @@ export type UserRow = {
   country: string | null;
   social_number: string | null;
   created_at: string;
+  weather_widget_visible: boolean;
 };
 
 export type PostRow = {

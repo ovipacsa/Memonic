@@ -18,8 +18,14 @@ export default async function NutritionPage() {
 
   return (
     <main className="px-[var(--gutter)] py-[clamp(28px,4vw,56px)]">
+      <div className="mx-auto max-w-[var(--max)]">
+        <Masthead
+          withFeedReturn
+          active="nutrition"
+          subtitle="Fuel the signal — track what you eat, honestly."
+        />
+      </div>
       <div className="mx-auto max-w-[860px]">
-        <Masthead active="nutrition" subtitle="Fuel the signal — track what you eat, honestly." />
         <NutritionTracker displayName={meRow.display_name} />
       </div>
     </main>

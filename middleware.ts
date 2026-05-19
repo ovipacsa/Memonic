@@ -6,7 +6,7 @@ const PROTECTED_PAGES = ["/feed", "/nutrition"];
 const PROTECTED_API_PREFIXES = ["/api/posts", "/api/me", "/api/nutrition", "/api/friends", "/api/users"];
 
 export const config = {
-  matcher: ["/feed/:path*", "/nutrition/:path*", "/api/posts/:path*", "/api/me", "/api/nutrition/:path*", "/api/friends/:path*", "/api/users/:path*"]
+  matcher: ["/feed/:path*", "/nutrition/:path*", "/api/posts/:path*", "/api/me", "/api/me/:path*", "/api/nutrition/:path*", "/api/friends/:path*", "/api/users/:path*"]
 };
 
 export async function middleware(req: NextRequest) {

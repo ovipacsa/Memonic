@@ -26,6 +26,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS users_country_social
   WHERE country IS NOT NULL AND social_number IS NOT NULL;
 CREATE INDEX IF NOT EXISTS users_created_at
   ON users (created_at);
+-- Weather widget preference (additive migration — safe to re-run)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS
+  weather_widget_visible BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- ─── posts ────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS posts (

@@ -383,6 +383,23 @@ a:focus-visible {
   animation: pulse-ring 1.8s ease-in-out infinite;
 }
 
+/* Weather widget animations */
+@keyframes weather-sun-pulse {
+  0%, 100% { opacity: 0.88; filter: drop-shadow(0 0 4px rgba(249, 240, 2, 0.7)); }
+  50%       { opacity: 1;    filter: drop-shadow(0 0 10px rgba(249, 240, 2, 1)); }
+}
+
+@keyframes weather-cloud-float {
+  0%, 100% { transform: translateX(0px); }
+  50%       { transform: translateX(3px); }
+}
+
+@keyframes weather-rain-fall {
+  0%   { transform: translateY(0px);  opacity: 1; }
+  80%  { transform: translateY(14px); opacity: 0.2; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
