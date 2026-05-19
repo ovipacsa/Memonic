@@ -119,10 +119,10 @@ export default function AuthCard() {
         <p className="mono text-[11px] uppercase tracking-meta text-cyan glow-cyan">
           Transmission 01 · Hosted in the European Union
         </p>
-        <h1 className="wordmark mt-5 whitespace-nowrap">
-          Memonic<span className="dot">.</span>
+        <h1 className="wordmark mt-3 text-center text-[clamp(20px,7cqw,70px)] whitespace-nowrap">
+          Memonic
         </h1>
-        <p className="terminal mt-4 text-star-soft text-[clamp(16px,1.5vw,20px)]">
+        <p className="terminal mt-2 text-star-soft text-[clamp(16px,1.5vw,20px)]">
           A social network for Europe — words and images, equal citizens.
         </p>
         <div className="rule-double mx-auto mt-8 max-w-[460px]" />

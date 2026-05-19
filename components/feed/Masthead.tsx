@@ -17,16 +17,20 @@ export default function Masthead({
   });
 
   return (
-    <header className="border-b border-cyan/40 pb-6 mb-10">
+    <header className="border-b border-cyan/40 pb-3 mb-6">
       <div className="flex items-center justify-between border-b border-purple/40 pb-3 mono text-[11px] uppercase tracking-meta text-cyan">
         <span>Transmission 01</span>
         <span className="hidden md:inline glow-magenta text-magenta">Connect Europe</span>
         <span className="hidden md:inline">{today}</span>
       </div>
-      <h1 className="wordmark mt-7 text-center text-[clamp(40px,13vw,168px)] whitespace-nowrap">
-        Memonic{withReturn ? <ReturnDot /> : <span className="dot">.</span>}
-      </h1>
-      <p className="terminal text-center mt-3 text-star-soft text-[clamp(16px,1.4vw,22px)]">
+      <div className="grid gap-10 md:grid-cols-[300px_minmax(0,1fr)_240px]">
+        <div />
+        <h1 className="wordmark mt-3 text-center text-[clamp(16px,8.65vw,118px)] whitespace-nowrap">
+          {withReturn ? <>Mem<span className="relative inline-block">o<ReturnDot /></span>nic</> : "Memonic"}
+        </h1>
+        <div />
+      </div>
+      <p className="terminal text-center mt-2 text-star-soft text-[clamp(16px,1.4vw,22px)]">
         {subtitle ?? "A small corner of the universe, observed honestly."}
       </p>
       {active === "nutrition" && (
