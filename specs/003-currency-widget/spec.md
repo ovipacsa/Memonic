@@ -106,6 +106,10 @@ Exchange rates and commodity prices change throughout the trading day. The widge
 ### Functional Requirements
 
 - **FR-001**: The currency widget MUST be positioned in the left area of the Masthead, horizontally opposite to the weather widget, and vertically aligned with it.
+- **FR-001b**: A toggle button (styled as a currency/coin symbol) MUST be permanently visible in the upper-left area of the feed page, mirroring the weather widget's cloud toggle button on the upper-right.
+- **FR-001c**: Clicking the toggle button MUST show the widget (if hidden) or hide it (if visible), with a ~300 ms fade animation — identical behaviour to the weather widget toggle.
+- **FR-001d**: The widget MUST include a close (X) button anchored to the bottom-right corner of the widget panel, identical in position and behaviour to the weather widget's X button.
+- **FR-001e**: The user's widget visibility preference (shown/hidden) MUST be persisted in the database against their user record so the preference is consistent across devices and sessions.
 - **FR-002**: The widget MUST visually conform to the Mnemonic Studio neon/cyberpunk aesthetic — same typography (Space Mono / VT323), same colour palette (midnight background, magenta/cyan/yellow accents), same scanline-compatible styling as the weather widget.
 - **FR-003**: The widget MUST use the browser Geolocation API to determine the user's country on page load.
 - **FR-004**: The system MUST map the detected country to its current official national currency.
@@ -151,8 +155,9 @@ Exchange rates and commodity prices change throughout the trading day. The widge
 - Browser Geolocation API will be used for country detection, consistent with the approach already established by the weather widget.
 - A free, key-free public financial data API exists and is suitable for this use case (e.g., Frankfurter.app for ECB-published EUR exchange rates; a commodity data source for crude oil).
 - Crude oil price will use Brent crude as the reference benchmark, as it is the European/international standard (WTI is the North American benchmark).
-- The widget is always visible on the feed page (not toggle-gated like the weather widget), providing ambient financial context without requiring user activation.
+- The widget uses a toggle mechanism identical in behaviour to the weather widget: a dedicated toggle button is visible in the upper-left area of the feed; clicking it shows or hides the widget with a fade animation.
+- The toggle button shape should be thematically distinct from the weather widget's cloud button — a currency symbol (e.g., a stylised "¤" or coin outline) is appropriate.
+- The user's widget visibility preference (shown/hidden) is persisted in the database against their user record, consistent with the weather widget persistence pattern.
 - Exchange rates are indicative mid-market rates, not live trading rates. A disclaimer "indicative rates only" is acceptable in the widget footer.
 - The widget shares the geolocation result already obtained by the weather widget via a shared client-side state, avoiding duplicate permission prompts.
 - Currency data is fetched client-side; no server-side proxy is required unless CORS restrictions on the chosen API make client-side requests impossible.
-- The widget layout does not need a toggle button — it is always displayed for users who grant location permission. [NEEDS CLARIFICATION: Should the currency widget be always-on, or should it also have a toggle mechanism like the weather widget?]
