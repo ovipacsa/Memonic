@@ -6,8 +6,12 @@ import { z } from "zod";
 export const runtime = "nodejs";
 
 const PreferencesBody = z.object({
-  weatherWidgetVisible: z.boolean(),
-});
+  weatherWidgetVisible:  z.boolean().optional(),
+  currencyWidgetVisible: z.boolean().optional(),
+}).refine(
+  (d) => d.weatherWidgetVisible !== undefined || d.currencyWidgetVisible !== undefined,
+  { message: "At least one preference field required" }
+);
 
 export async function PATCH(req: Request) {
   const session = await getSession();
@@ -19,11 +23,19 @@ export async function PATCH(req: Request) {
 
   const sql = getDb();
   try {
-    await sql`
-      UPDATE users
-      SET weather_widget_visible = ${parsed.data.weatherWidgetVisible}
-      WHERE user_id = ${session.userId}::uuid
-    `;
+    const { weatherWidgetVisible, currencyWidgetVisible } = parsed.data;
+    if (weatherWidgetVisible !== undefined) {
+      await sql`
+        UPDATE users SET weather_widget_visible = ${weatherWidgetVisible}
+        WHERE user_id = ${session.userId}::uuid
+      `;
+    }
+    if (currencyWidgetVisible !== undefined) {
+      await sql`
+        UPDATE users SET currency_widget_visible = ${currencyWidgetVisible}
+        WHERE user_id = ${session.userId}::uuid
+      `;
+    }
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed to update preferences" }, { status: 500 });
