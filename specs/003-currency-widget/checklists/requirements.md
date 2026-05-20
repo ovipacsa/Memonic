@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — 1 marker present (toggle vs always-on)
+- [x] No [NEEDS CLARIFICATION] markers remain — resolved: toggle like weather widget (confirmed by user)
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic

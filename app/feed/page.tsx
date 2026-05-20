@@ -7,6 +7,7 @@ import Feed from "@/components/feed/Feed";
 import DailyStats from "@/components/nutrition/DailyStats";
 import PeopleRail from "@/components/feed/PeopleRail";
 import WeatherWidget from "@/components/feed/WeatherWidget";
+import CurrencyWidget from "@/components/feed/CurrencyWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -16,9 +17,9 @@ export default async function FeedPage() {
 
   const sql = getDb();
 
-  const [meRow] = await sql<Pick<UserRow, "id"|"email"|"display_name"|"photo"|"bio"|"city"|"created_at"|"weather_widget_visible">[]>`
+  const [meRow] = await sql<Pick<UserRow, "id"|"email"|"display_name"|"photo"|"bio"|"city"|"created_at"|"weather_widget_visible"|"currency_widget_visible">[]>`
     SELECT user_id AS id, email, display_name, photo, bio, city, created_at::text,
-           weather_widget_visible
+           weather_widget_visible, currency_widget_visible
     FROM users WHERE user_id = ${session.userId}::uuid
   `;
   if (!meRow) redirect("/");
@@ -87,6 +88,7 @@ export default async function FeedPage() {
       <div className="mx-auto max-w-[var(--max)]">
         <Masthead
           withReturn
+          leftSlot={<CurrencyWidget initialVisible={meRow.currency_widget_visible} />}
           rightSlot={<WeatherWidget initialVisible={meRow.weather_widget_visible} />}
         />
         <div className="grid gap-10 md:grid-cols-[300px_minmax(0,1fr)_240px]">

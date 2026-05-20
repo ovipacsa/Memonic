@@ -8,12 +8,14 @@ export default function Masthead({
   withFeedReturn = false,
   active = "feed",
   subtitle,
+  leftSlot,
   rightSlot,
 }: {
   withReturn?: boolean;
   withFeedReturn?: boolean;
   active?: "feed" | "nutrition";
   subtitle?: string;
+  leftSlot?: React.ReactNode;
   rightSlot?: React.ReactNode;
 }) {
   const today = new Date().toLocaleDateString("en-GB", {
@@ -30,7 +32,9 @@ export default function Masthead({
         <span className="hidden md:inline">{today}</span>
       </div>
       <div className="grid gap-x-10 md:grid-cols-[300px_minmax(0,1fr)_240px] items-center">
-        <div />
+        <div className="hidden md:flex items-center justify-end pr-2 self-stretch">
+          {leftSlot}
+        </div>
         <div>
           <h1 className="wordmark mt-3 text-center text-[clamp(16px,8.65vw,118px)] whitespace-nowrap">
             {withReturn

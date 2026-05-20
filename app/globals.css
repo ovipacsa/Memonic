@@ -400,6 +400,19 @@ a:focus-visible {
   100% { transform: translateY(14px); opacity: 0; }
 }
 
+/* Currency widget animations */
+@keyframes currency-coin-spin {
+  0%, 100% { transform: rotateY(0deg);   filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.6)); }
+  40%       { transform: rotateY(70deg);  filter: drop-shadow(0 0 2px rgba(0, 240, 255, 0.3)); }
+  50%       { transform: rotateY(90deg);  filter: drop-shadow(0 0 1px rgba(0, 240, 255, 0.1)); }
+  60%       { transform: rotateY(110deg); filter: drop-shadow(0 0 2px rgba(0, 240, 255, 0.3)); }
+}
+
+@keyframes currency-pulse {
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 3px rgba(0, 240, 255, 0.5)); }
+  50%       { opacity: 1;    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9)); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
