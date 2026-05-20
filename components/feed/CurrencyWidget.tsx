@@ -87,15 +87,15 @@ function CoinButton({ onClick }: { onClick: () => void }) {
 
 function RateRow({ label, value, status }: { label: string; value: string; status: RowStatus }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "5px" }}>
-      <dt className="terminal" style={{ color: "var(--star-soft)", fontSize: "11px", letterSpacing: "0.12em" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "3px" }}>
+      <dt className="terminal" style={{ color: "var(--star-soft)", fontSize: "10px", letterSpacing: "0.10em" }}>
         {label}
       </dt>
       <dd className="mono" style={{
         color: status === "ok" ? "var(--magenta)" : "var(--mute)",
-        fontSize: status === "ok" ? "13px" : "12px",
+        fontSize: status === "ok" ? "11px" : "10px",
         margin: 0,
-        textShadow: status === "ok" ? "0 0 6px rgba(255,0,160,0.5)" : "none",
+        textShadow: status === "ok" ? "0 0 5px rgba(255,0,160,0.5)" : "none",
       }}>
         {status === "loading" ? "…" : status === "unavailable" ? "—" : value}
       </dd>
@@ -104,6 +104,18 @@ function RateRow({ label, value, status }: { label: string; value: string; statu
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
+
+const CURRENCY_CACHE_KEY = "memonic_currency_cache";
+
+function readCurrencyCache(): { data: CurrencyData | null; status: WidgetStatus } {
+  try {
+    const raw = localStorage.getItem(CURRENCY_CACHE_KEY);
+    if (!raw) return { data: null, status: "idle" };
+    const d = JSON.parse(raw) as CurrencyData;
+    if (Date.now() - d.lastFetched < REFRESH_MS) return { data: d, status: "ready" };
+  } catch { /* ignore */ }
+  return { data: null, status: "idle" };
+}
 
 export default function CurrencyWidget({ initialVisible }: { initialVisible: boolean }) {
   const [visible, setVisible]   = useState(initialVisible);
@@ -203,7 +215,9 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
       crudeStatus = "unavailable";
     }
 
-    setData({ zone, pairs, pairStatus, crude, crudeStatus, lastFetched: Date.now(), fallbackLabel });
+    const newData: CurrencyData = { zone, pairs, pairStatus, crude, crudeStatus, lastFetched: Date.now(), fallbackLabel };
+    try { localStorage.setItem(CURRENCY_CACHE_KEY, JSON.stringify(newData)); } catch { /* ignore */ }
+    setData(newData);
     setStatus("ready");
     pendingRef.current = false;
   }, [data]);
@@ -222,13 +236,32 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
     savePreference(false);
   }, [savePreference]);
 
+  // On mount: restore from cache if fresh, otherwise fetch
   useEffect(() => {
-    if (initialVisible && status === "idle") fetchData();
+    const cached = readCurrencyCache();
+    if (cached.data) {
+      setData(cached.data);
+      setStatus("ready");
+    } else if (initialVisible) {
+      fetchData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Auto-refresh every 30 min while widget is open
+  useEffect(() => {
+    if (!visible) return;
+    const id = setInterval(() => fetchData(), REFRESH_MS);
+    return () => clearInterval(id);
+  }, [visible, fetchData]);
+
   // ── Closed state ─────────────────────────────────────────────────────────────
-  if (!visible) return <CoinButton onClick={open} />;
+  // Closed: button pinned to right edge of column, vertically centered — mirrors cloud button
+  if (!visible) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", width: "100%", height: "100%", paddingRight: "8px" }}>
+      <CoinButton onClick={open} />
+    </div>
+  );
 
   // ── Helpers for display ───────────────────────────────────────────────────────
   const isLoading = status === "loading" || status === "idle";
@@ -240,18 +273,19 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
         return [{ label: "EUR → USD", value: "—", status: "loading" as RowStatus },
                 { label: "EUR → CNY", value: "—", status: "loading" as RowStatus }];
       }
-      return [{ label: `${zone.currencyCode} → EUR`, value: "—", status: "loading" as RowStatus },
-              { label: `${zone.currencyCode} → USD`, value: "—", status: "loading" as RowStatus }];
+      return [{ label: `EUR → ${zone.currencyCode}`, value: "—", status: "loading" as RowStatus },
+              { label: `USD → ${zone.currencyCode}`, value: "—", status: "loading" as RowStatus }];
     }
     const { zone, pairs, pairStatus } = data;
     if (pairStatus === "unavailable") {
-      const base = zone.type === "local" ? zone.currencyCode : "EUR";
-      const tos  = zone.type === "local" ? ["EUR", "USD"] : ["USD", "CNY"];
-      return tos.map((q) => ({ label: `${base} → ${q}`, value: "—", status: "unavailable" as RowStatus }));
+      const tos = zone.type === "local" ? ["EUR", "USD"] : ["USD", "CNY"];
+      const loc  = zone.type === "local" ? zone.currencyCode : "EUR";
+      return tos.map((q) => ({ label: `${q} → ${loc}`, value: "—", status: "unavailable" as RowStatus }));
     }
+    // Invert: fetched pairs are LOCAL→EUR and LOCAL→USD; display as EUR→LOCAL and USD→LOCAL
     return pairs.map((p) => ({
-      label: `${p.base} → ${p.quote}`,
-      value: formatRate(p.rate),
+      label: `${p.quote} → ${p.base}`,
+      value: formatRate(1 / p.rate),
       status: "ok" as RowStatus,
     }));
   })();
@@ -260,8 +294,9 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
     ? new Date(data.lastFetched).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
     : null;
 
-  // ── Open state ───────────────────────────────────────────────────────────────
+  // ── Open state: centered in column, 15px from top line ──────────────────────
   return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", width: "100%", paddingTop: "15px" }}>
     <div
       role="region"
       aria-label="Currency & commodities"
@@ -270,21 +305,21 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
         border: "1px solid rgba(0,240,255,0.28)",
         boxShadow: "0 0 18px rgba(0,240,255,0.07), inset 0 0 18px rgba(13,2,33,0.9)",
         borderRadius: "2px",
-        padding: "8px 12px 8px 10px",
-        width: "220px",
+        padding: "5px 10px 5px 8px",
+        width: "200px",
         animation: "fadeSlideIn 0.3s ease both",
       }}
     >
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
         <div aria-hidden="true" style={{ flexShrink: 0 }}>
-          <CoinIcon size={28} animate={isLoading} />
+          <CoinIcon size={22} animate={isLoading} />
         </div>
         <span
           className="terminal"
           style={{
             color: "var(--cyan)",
-            fontSize: "11px",
+            fontSize: "10px",
             letterSpacing: "0.15em",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -300,10 +335,10 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
       {data?.fallbackLabel && (
         <p className="terminal" style={{
           color: "var(--mute)",
-          fontSize: "10px",
-          margin: "0 0 6px 0",
+          fontSize: "9px",
+          margin: "0 0 4px 0",
           lineHeight: 1.3,
-          letterSpacing: "0.08em",
+          letterSpacing: "0.06em",
         }}>
           {data.fallbackLabel}
         </p>
@@ -321,7 +356,7 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
         ))}
 
         {/* Divider */}
-        <div style={{ borderTop: "1px solid rgba(0,240,255,0.12)", margin: "5px 0" }} />
+        <div style={{ borderTop: "1px solid rgba(0,240,255,0.12)", margin: "3px 0" }} />
 
         {/* Crude oil row */}
         <RateRow
@@ -334,10 +369,10 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
         {data?.crude?.asOf && !isLoading && (
           <p className="terminal" style={{
             color: "var(--mute)",
-            fontSize: "9px",
-            margin: "0 0 2px 0",
+            fontSize: "8px",
+            margin: "0 0 1px 0",
             textAlign: "right",
-            letterSpacing: "0.06em",
+            letterSpacing: "0.05em",
           }}>
             as of {data.crude.asOf}
           </p>
@@ -345,15 +380,15 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
       </dl>
 
       {/* Footer: indicative note + last updated + close */}
-      <div style={{ marginTop: "6px", borderTop: "1px solid rgba(0,240,255,0.08)", paddingTop: "5px" }}>
+      <div style={{ marginTop: "4px", borderTop: "1px solid rgba(0,240,255,0.08)", paddingTop: "4px" }}>
         <p className="terminal" style={{
           color: "var(--mute)",
-          fontSize: "9px",
-          margin: "0 0 4px 0",
-          letterSpacing: "0.06em",
+          fontSize: "8px",
+          margin: "0 0 3px 0",
+          letterSpacing: "0.05em",
           opacity: 0.7,
         }}>
-          {lastUpdated ? `INDICATIVE · UPDATED ${lastUpdated}` : "INDICATIVE RATES"}
+          {lastUpdated ? `INDICATIVE · ${lastUpdated}` : "INDICATIVE RATES"}
         </p>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <button
@@ -376,10 +411,11 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
             onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
           >
-            ✕ CLOSE
+            ✕
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

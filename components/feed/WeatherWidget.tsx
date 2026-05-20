@@ -174,6 +174,18 @@ function ConditionIcon({ condition, size }: { condition: ConditionCategory | und
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
+const WEATHER_CACHE_KEY = "memonic_weather_cache";
+
+function readWeatherCache(): { weather: WeatherState | null; status: WidgetStatus } {
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_KEY);
+    if (!raw) return { weather: null, status: "idle" };
+    const w = JSON.parse(raw) as WeatherState;
+    if (Date.now() - w.lastFetched < REFRESH_MS) return { weather: w, status: "ready" };
+  } catch { /* ignore */ }
+  return { weather: null, status: "idle" };
+}
+
 export default function WeatherWidget({ initialVisible }: { initialVisible: boolean }) {
   const [visible, setVisible]   = useState(initialVisible);
   const [status, setStatus]     = useState<WidgetStatus>("idle");
@@ -233,14 +245,16 @@ export default function WeatherWidget({ initialVisible }: { initialVisible: bool
               null;
           }
 
-          setWeather({
+          const newWeather: WeatherState = {
             temperatureC:      Math.round(c.temperature_2m),
             rainProbabilityPct: c.precipitation_probability ?? 0,
             humidityPct:       Math.round(c.relative_humidity_2m),
             condition:         wmoToCondition(c.weather_code),
             cityName,
             lastFetched:       Date.now(),
-          });
+          };
+          try { localStorage.setItem(WEATHER_CACHE_KEY, JSON.stringify(newWeather)); } catch { /* ignore */ }
+          setWeather(newWeather);
           setStatus("ready");
           setErrorMsg(null);
         } catch {
@@ -279,11 +293,24 @@ export default function WeatherWidget({ initialVisible }: { initialVisible: bool
     savePreference(false);
   }, [savePreference]);
 
-  // Fetch on mount if initially visible
+  // On mount: restore from cache if fresh, otherwise fetch
   useEffect(() => {
-    if (initialVisible && status === "idle") fetchWeather();
+    const cached = readWeatherCache();
+    if (cached.weather) {
+      setWeather(cached.weather);
+      setStatus("ready");
+    } else if (initialVisible) {
+      fetchWeather();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-refresh every 30 min while widget is open
+  useEffect(() => {
+    if (!visible) return;
+    const id = setInterval(() => fetchWeather(), REFRESH_MS);
+    return () => clearInterval(id);
+  }, [visible, fetchWeather]);
 
   // ── Closed state: show cloud button only ─────────────────────────────────────
   if (!visible) {
@@ -396,7 +423,7 @@ export default function WeatherWidget({ initialVisible }: { initialVisible: bool
           onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
           onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
         >
-          ✕ CLOSE
+          ✕
         </button>
       </div>
     </div>

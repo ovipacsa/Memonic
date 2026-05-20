@@ -32,7 +32,7 @@ export default function Masthead({
         <span className="hidden md:inline">{today}</span>
       </div>
       <div className="grid gap-x-10 md:grid-cols-[300px_minmax(0,1fr)_240px] items-center">
-        <div className="hidden md:flex items-center justify-end pr-2 self-stretch">
+        <div className="hidden md:flex self-stretch">
           {leftSlot}
         </div>
         <div>
