@@ -34,6 +34,8 @@ export type UserRow = {
   created_at: string;
   weather_widget_visible: boolean;
   currency_widget_visible: boolean;
+  deactivated: boolean;
+  deactivated_at: string | null;
 };
 
 export type PostRow = {

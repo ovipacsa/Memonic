@@ -21,7 +21,8 @@ export async function POST(req: Request) {
   const [row] = await sql<UserRow[]>`
     SELECT
       user_id AS id, email, password_hash, display_name, first_name, family_name,
-      dob::text, photo, bio, city, country, social_number, created_at::text
+      dob::text, photo, bio, city, country, social_number, created_at::text,
+      deactivated
     FROM users WHERE LOWER(email) = LOWER(${email})
   `;
 
@@ -32,6 +33,10 @@ export async function POST(req: Request) {
   const ok = await verifyPassword(password, row.password_hash);
   if (!ok) {
     return NextResponse.json({ error: "Email or password is incorrect." }, { status: 401 });
+  }
+
+  if (row.deactivated) {
+    return NextResponse.json({ error: "This account has been deactivated." }, { status: 403 });
   }
 
   await setSessionCookie(row.id);
