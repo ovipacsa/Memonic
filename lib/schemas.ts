@@ -37,6 +37,10 @@ export const newPostSchema = z
     { message: "Image posts require an image", path: ["image"] }
   );
 
+export const purgeResponseSchema = z.object({
+  success: z.boolean(),
+});
+
 export type NewPost = z.infer<typeof newPostSchema>;
 export type SignupInput = z.infer<typeof signupSchema>;
 export type SignupFormInput = SignupInput;

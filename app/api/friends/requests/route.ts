@@ -19,6 +19,7 @@ export async function GET() {
     FROM friend_requests fr
     JOIN users u ON u.user_id = fr.from_user_id
     WHERE fr.to_user_id = ${session.userId}::uuid AND fr.status = 'pending'
+      AND u.deactivated = FALSE
     ORDER BY fr.created_at DESC
   `;
 
