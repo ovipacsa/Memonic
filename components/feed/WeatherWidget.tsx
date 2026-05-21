@@ -201,9 +201,10 @@ export default function WeatherWidget({ initialVisible }: { initialVisible: bool
     }).catch(() => {});
   }, []);
 
-  const fetchWeather = useCallback(() => {
+  const fetchWeather = useCallback((force = false) => {
     if (pendingRef.current) return;
-    if (weather && Date.now() - weather.lastFetched < REFRESH_MS) return;
+    if (!force && weather && Date.now() - weather.lastFetched < REFRESH_MS) return;
+    if (force) { try { localStorage.removeItem(WEATHER_CACHE_KEY); } catch { /* ignore */ } }
 
     pendingRef.current = true;
     setStatus("loading");
@@ -401,8 +402,29 @@ export default function WeatherWidget({ initialVisible }: { initialVisible: bool
         </div>
       )}
 
-      {/* Close button — bottom right */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px" }}>
+      {/* Footer: refresh dot (left) + close button (right) */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "6px" }}>
+        <button
+          type="button"
+          onClick={() => fetchWeather(true)}
+          disabled={status === "loading"}
+          aria-label="Refresh"
+          title="Force refresh"
+          style={{
+            background: "var(--cyan)",
+            border: "none",
+            borderRadius: "50%",
+            width: "8px",
+            height: "8px",
+            padding: 0,
+            cursor: status === "loading" ? "not-allowed" : "pointer",
+            opacity: status === "loading" ? 0.3 : 0.55,
+            transition: "opacity 120ms ease",
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => { if (status !== "loading") e.currentTarget.style.opacity = "1"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.opacity = status === "loading" ? "0.3" : "0.55"; }}
+        />
         <button
           type="button"
           onClick={close}

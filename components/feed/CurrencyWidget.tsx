@@ -131,9 +131,10 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
     }).catch(() => {});
   }, []);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (force = false) => {
     if (pendingRef.current) return;
-    if (data && Date.now() - data.lastFetched < REFRESH_MS) return;
+    if (!force && data && Date.now() - data.lastFetched < REFRESH_MS) return;
+    if (force) { try { localStorage.removeItem(CURRENCY_CACHE_KEY); } catch { /* ignore */ } }
 
     pendingRef.current = true;
     setStatus("loading");
@@ -390,7 +391,28 @@ export default function CurrencyWidget({ initialVisible }: { initialVisible: boo
         }}>
           {lastUpdated ? `INDICATIVE · ${lastUpdated}` : "INDICATIVE RATES"}
         </p>
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <button
+            type="button"
+            onClick={() => fetchData(true)}
+            disabled={status === "loading"}
+            aria-label="Refresh"
+            title="Force refresh"
+            style={{
+              background: "var(--cyan)",
+              border: "none",
+              borderRadius: "50%",
+              width: "8px",
+              height: "8px",
+              padding: 0,
+              cursor: status === "loading" ? "not-allowed" : "pointer",
+              opacity: status === "loading" ? 0.3 : 0.55,
+              transition: "opacity 120ms ease",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => { if (status !== "loading") e.currentTarget.style.opacity = "1"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = status === "loading" ? "0.3" : "0.55"; }}
+          />
           <button
             type="button"
             onClick={close}
