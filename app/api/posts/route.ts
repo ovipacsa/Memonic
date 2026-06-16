@@ -27,7 +27,8 @@ export async function GET() {
     SELECT ${sql.unsafe(FEED_SELECT)}
     FROM posts p
     JOIN users u ON u.user_id = p.user_id
-    WHERE p.user_id = ${session.userId}::uuid
+    WHERE u.deactivated = FALSE
+      AND (p.user_id = ${session.userId}::uuid
        OR p.user_id IN (
          SELECT CASE
            WHEN from_user_id = ${session.userId}::uuid THEN to_user_id
@@ -36,7 +37,7 @@ export async function GET() {
          FROM friend_requests
          WHERE status = 'accepted'
            AND (from_user_id = ${session.userId}::uuid OR to_user_id = ${session.userId}::uuid)
-       )
+       ))
     ORDER BY p.created_at DESC
     LIMIT ${FEED_LIMIT}
   `;

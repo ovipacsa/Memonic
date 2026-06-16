@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getActiveSession } from "@/lib/auth";
 import { getDb, type FeedItem, type UserRow, type PersonEntry } from "@/lib/db";
 import Masthead from "@/components/feed/Masthead";
 import ProfileRail from "@/components/feed/ProfileRail";
@@ -13,7 +13,7 @@ import CurrencyWidget from "@/components/feed/CurrencyWidget";
 export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
-  const session = await getSession();
+  const session = await getActiveSession();
   if (!session) redirect("/");
 
   const sql = getDb();
@@ -30,6 +30,7 @@ export default async function FeedPage() {
     SELECT user_id AS id, display_name, city, country, photo
     FROM users
     WHERE user_id != ${session.userId}::uuid
+      AND deactivated = FALSE
       AND user_id NOT IN (
         SELECT blocked_id FROM user_blocks
         WHERE blocker_id = ${session.userId}::uuid AND blocked_until > now()
