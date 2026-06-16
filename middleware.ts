@@ -3,10 +3,10 @@ import type { NextRequest } from "next/server";
 import { verifySession, SESSION_COOKIE } from "@/lib/jwt";
 
 const PROTECTED_PAGES = ["/feed", "/nutrition"];
-const PROTECTED_API_PREFIXES = ["/api/posts", "/api/me", "/api/nutrition", "/api/friends", "/api/users"];
+const PROTECTED_API_PREFIXES = ["/api/posts", "/api/me", "/api/nutrition", "/api/friends", "/api/users", "/api/markets"];
 
 export const config = {
-  matcher: ["/feed/:path*", "/nutrition/:path*", "/api/posts/:path*", "/api/me", "/api/me/:path*", "/api/nutrition/:path*", "/api/friends/:path*", "/api/users/:path*"]
+  matcher: ["/feed/:path*", "/nutrition/:path*", "/api/posts/:path*", "/api/me", "/api/me/:path*", "/api/nutrition/:path*", "/api/friends/:path*", "/api/users/:path*", "/api/markets/:path*"]
 };
 
 export async function middleware(req: NextRequest) {
