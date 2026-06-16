@@ -5,6 +5,7 @@ import Masthead from "@/components/feed/Masthead";
 import ProfileRail from "@/components/feed/ProfileRail";
 import Feed from "@/components/feed/Feed";
 import DailyStats from "@/components/nutrition/DailyStats";
+import AssetsWidget from "@/components/nutrition/AssetsWidget";
 import PeopleRail from "@/components/feed/PeopleRail";
 import WeatherWidget from "@/components/feed/WeatherWidget";
 import CurrencyWidget from "@/components/feed/CurrencyWidget";
@@ -99,6 +100,7 @@ export default async function FeedPage() {
               totalCalories={nutritionToday.total_cal}
               entryCount={nutritionToday.entry_count}
             />
+            <AssetsWidget />
           </div>
           <Feed initialPosts={posts} />
           <div className="md:sticky md:top-6 md:self-start">
